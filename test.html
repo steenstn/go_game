@@ -1,0 +1,36 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <canvas id="c"></canvas>
+<script>
+
+    let c = document.getElementById('c');
+    c.width = 500;
+    c.height = 500;
+    let ctx = c.getContext('2d');
+
+    let keysDown = new Set();
+        addEventListener("keydown", (e) => {
+        keysDown.add(e.key);
+            console.log(e.key)
+            let value = (1 & (keysDown.has("ArrowUp")? 1 : 0) )|
+                        (2 & (keysDown.has("ArrowDown")? 2 : 0)) |
+                        (4 & (keysDown.has("ArrowLeft")? 4 : 0)) |
+                        (8 & (keysDown.has("ArrowRight")? 8 : 0));
+        console.log(value);
+        }, false);
+
+        addEventListener("keyup", (e) => {
+
+        keysDown.delete(e.key);
+            let value = (1 & (keysDown.has("ArrowUp")? 1 : 0) )|
+                        (2 & (keysDown.has("ArrowDown")? 2 : 0)) |
+                        (4 & (keysDown.has("ArrowLeft")? 4 : 0)) |
+                        (8 & (keysDown.has("ArrowRight")? 8 : 0));
+        console.log(value);
+    })
+        </script>
+    </body>
+</html>
+
