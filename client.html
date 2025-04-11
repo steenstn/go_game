@@ -1,0 +1,105 @@
+<html>
+    <head>
+<style>
+        canvas {
+            border: 1px solid #eee
+        }
+        </style>
+    </head>
+    <body>
+<input id="input" type="text" />
+<button onclick="send()">Send</button>
+<button onclick="joinGame()">Join</button>
+        <br />
+        <canvas id="c"></canvas>
+<pre id="output"></pre>
+<script>
+
+    "use strict";
+    let input = document.getElementById("input");
+    let output = document.getElementById("output");
+    let socket;
+    let keysDown = new Set();
+    let keysHit = new Set();
+    let keyDownCounter; // TODO: Kommer antagligen behöva hantera per tangent
+
+    let c = document.getElementById('c');
+    c.width = 500;
+    c.height = 500;
+    let ctx = c.getContext('2d');
+    ctx.fillStyle = "#000";
+  
+
+    let pressKey = (key) => {
+        keysDown.add(key);
+        //keysDown[key] = true;
+        keyDownCounter++;
+        if(keyDownCounter === 1) {
+            keysHit.add(key);
+            //keysHit[key] = true;
+        }
+            socket.send(Array.from(keysDown).join(''));
+    }
+
+    let releaseKey = (key) => {
+        keyDownCounter = 0;
+        keysDown.delete(key);
+        keysHit.delete(key);
+            socket.send(Array.from(keysDown).join(''));
+ //       delete keysDown[key];
+//        delete keysHit[key];
+    };
+
+    let setupKeyListeners = () => {
+        addEventListener("keydown", (e) => {
+            pressKey(e.key);
+        }, false);
+
+        addEventListener("keyup", (e) => {
+            releaseKey(e.key);
+        }, false)
+    };
+
+    let joinGame = () => {
+        socket = new WebSocket("ws://localhost:8080/join");
+        socket.onopen = function () {
+            output.innerHTML += "Status: Connected\n";
+        };
+
+        socket.onmessage = function (e) {
+            let json = JSON.parse(e.data);
+            let message = JSON.parse(atob(json.Msg));
+
+//            output.innerHTML = "Server: " + JSON.stringify(message) + "\n";
+            
+            console.log(message[0]);
+            ctx.fillStyle="#fff";
+            ctx.fillRect(0,0,500,500);
+            ctx.fillStyle="#000";
+            for(let i = 0; i < message.length; i++) {
+                ctx.fillRect(message[i].X, message[i].Y, 10, 10);
+            }
+        };
+
+        setupKeyListeners();
+        setInterval(gameLoop, 40);
+    };
+
+
+    function send() {
+        socket.send(input.value);
+        input.value = "";
+    }
+
+    let gameLoop = () => {
+        if(keysDown.size !== 0) {
+            console.log(keysDown.size);
+            console.log(keysDown)
+            
+        } 
+    }
+
+
+</script>
+    </body>
+</html>
