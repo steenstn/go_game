@@ -49,7 +49,10 @@ func main() {
 		http.ServeFile(w, r, "client.html")
 	})
 
-	http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		println(err.Error())
+	}
 
 }
 

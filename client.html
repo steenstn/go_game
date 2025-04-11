@@ -30,6 +30,12 @@
     ctx.fillStyle = "#000";
   
 
+    let convertKeyPressesToByte = (input) => {
+      return (1 & (input.has("ArrowUp")? 1 : 0) )|
+                (2 & (input.has("ArrowDown")? 2 : 0)) |
+                (4 & (input.has("ArrowLeft")? 4 : 0)) |
+                (8 & (input.has("ArrowRight")? 8 : 0));
+    }
     let pressKey = (key) => {
         keysDown.add(key);
         //keysDown[key] = true;
@@ -38,14 +44,15 @@
             keysHit.add(key);
             //keysHit[key] = true;
         }
-            socket.send(Array.from(keysDown).join(''));
+
+            socket.send(convertKeyPressesToByte(keysDown));
     }
 
     let releaseKey = (key) => {
         keyDownCounter = 0;
         keysDown.delete(key);
         keysHit.delete(key);
-            socket.send(Array.from(keysDown).join(''));
+            socket.send(convertKeyPressesToByte(keysDown));
  //       delete keysDown[key];
 //        delete keysHit[key];
     };
@@ -98,7 +105,6 @@
             
         } 
     }
-
 
 </script>
     </body>

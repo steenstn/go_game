@@ -2,7 +2,6 @@ package game
 
 import (
 	"game/queue"
-	"strings"
 )
 
 type Player struct {
@@ -40,24 +39,24 @@ type PlayerKeyPress struct {
 
 func HandleInput(player *Player, input string) {
 
-	if strings.Contains(input, "ArrowUp") {
+	if input == "1" {
 		player.keyPresses.Up = true
 	} else {
 		player.keyPresses.Up = false
 	}
-	if strings.Contains(input, "ArrowDown") {
+	if input == "2" {
 		player.keyPresses.Down = true
 	} else {
 		player.keyPresses.Down = false
 	}
 
-	if strings.Contains(input, "ArrowLeft") {
+	if input == "4" {
 		player.keyPresses.Left = true
 	} else {
 		player.keyPresses.Left = false
 	}
 
-	if strings.Contains(input, "ArrowRight") {
+	if input == "8" {
 		player.keyPresses.Right = true
 	} else {
 		player.keyPresses.Right = false
