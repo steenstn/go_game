@@ -37,30 +37,13 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
-func HandleInput(player *Player, input string) {
+// TODO Handle multipl keys being pressed, handle as numbers
+func HandleInput(player *Player, input byte) {
 
-	if input == "1" {
-		player.keyPresses.Up = true
-	} else {
-		player.keyPresses.Up = false
-	}
-	if input == "2" {
-		player.keyPresses.Down = true
-	} else {
-		player.keyPresses.Down = false
-	}
-
-	if input == "4" {
-		player.keyPresses.Left = true
-	} else {
-		player.keyPresses.Left = false
-	}
-
-	if input == "8" {
-		player.keyPresses.Right = true
-	} else {
-		player.keyPresses.Right = false
-	}
+	player.keyPresses.Up = input&1 > 0
+	player.keyPresses.Down = input&2 > 0
+	player.keyPresses.Left = input&4 > 0
+	player.keyPresses.Right = input&8 > 0
 
 }
 

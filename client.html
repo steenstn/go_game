@@ -31,10 +31,11 @@
   
 
     let convertKeyPressesToByte = (input) => {
-      return (1 & (input.has("ArrowUp")? 1 : 0) )|
+       let buttonsPressed = (1 & (input.has("ArrowUp")? 1 : 0) )|
                 (2 & (input.has("ArrowDown")? 2 : 0)) |
                 (4 & (input.has("ArrowLeft")? 4 : 0)) |
                 (8 & (input.has("ArrowRight")? 8 : 0));
+        return new Uint8Array([buttonsPressed]);
     }
     let pressKey = (key) => {
         keysDown.add(key);
@@ -52,7 +53,10 @@
         keyDownCounter = 0;
         keysDown.delete(key);
         keysHit.delete(key);
-            socket.send(convertKeyPressesToByte(keysDown));
+        var input = convertKeyPressesToByte(keysDown);
+        console.log("input", input)
+            socket.send(input);
+
  //       delete keysDown[key];
 //        delete keysHit[key];
     };
@@ -79,7 +83,7 @@
 
 //            output.innerHTML = "Server: " + JSON.stringify(message) + "\n";
             
-            console.log(message[0]);
+            //console.log(message[0]);
             ctx.fillStyle="#fff";
             ctx.fillRect(0,0,500,500);
             ctx.fillStyle="#000";
@@ -100,8 +104,8 @@
 
     let gameLoop = () => {
         if(keysDown.size !== 0) {
-            console.log(keysDown.size);
-            console.log(keysDown)
+            //console.log(keysDown.size);
+            //console.log(keysDown)
             
         } 
     }

@@ -94,9 +94,16 @@ func inputLoop(client *Client) {
 			client.connected = false
 			break
 		}
-		input := string(msg)
+
+		fmt.Printf("input: %b\n", msg)
+		if len(msg) > 1 {
+			println("Input message is too long, dropping")
+			println(string(msg))
+			println("--")
+			continue
+		}
+		input := msg[0]
 		game.HandleInput(client.player, input)
-		println(input)
 	}
 }
 
