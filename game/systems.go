@@ -19,23 +19,29 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 				velocity.Vy = -playerSpeed
 			} else if player.Down {
 				velocity.Vy = playerSpeed
-			} else {
-				velocity.Vy = 0
 			}
 		}
 	}
 
 }
 
-func MoveStuff(positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity) {
+func MoveStuff(positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, forceRegistry map[EntityId]*Force) {
 
 	for e := EntityId(0); e < NumEntities; e++ {
 		position, pOk := positionRegistry[e]
 		velocity, vOk := velocityRegistry[e]
+		force, fOk := forceRegistry[e]
 
-		if pOk && vOk {
+		if pOk && vOk && fOk {
+			velocity.Vx += force.X
+			velocity.Vy += force.Y
+
 			position.X += velocity.Vx
 			position.Y += velocity.Vy
+			if position.Y > 400 {
+				position.Y = 400
+				velocity.Vy = 0
+			}
 		}
 	}
 
