@@ -15,8 +15,6 @@ const MAX_ENTITIES = 100
 var entities = make([]EntityId, MAX_ENTITIES)
 
 var playerSpeed = 3
-var players = make([]*Player, 0)
-var playerKeyPresses = make([]*PlayerKeyPress, 0)
 
 func AddPlayer() EntityId {
 

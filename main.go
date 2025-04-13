@@ -130,24 +130,4 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	clients = append(clients, &newClient)
 	go inputLoop(&newClient, entityId)
 
-	/*
-		for {
-			// Read message from browser
-			msgType, msg, err := conn.ReadMessage()
-
-			if err != nil {
-				println("Failed to read message")
-				println(err.Error())
-				return
-			}
-
-			// Print the message to the console
-			fmt.Printf("%s sent: %s\n", conn.RemoteAddr(), string(msg))
-
-			// Write message back to browser
-			if err = conn.WriteMessage(msgType, msg); err != nil {
-				return
-			}
-		}
-	*/
 }
