@@ -7,21 +7,14 @@
         </style>
     </head>
     <body>
-<input id="input" type="text" />
-<button onclick="send()">Send</button>
-<button onclick="joinGame()">Join</button>
-        <br />
-        <canvas id="c"></canvas>
+<canvas id="c"></canvas>
 <pre id="output"></pre>
 <script>
-
     "use strict";
     let input = document.getElementById("input");
     let output = document.getElementById("output");
     let socket;
     let keysDown = new Set();
-    let keysHit = new Set();
-    let keyDownCounter; // TODO: Kommer antagligen behöva hantera per tangent
 
     let c = document.getElementById('c');
     c.width = 500;
@@ -31,34 +24,22 @@
   
 
     let convertKeyPressesToByte = (input) => {
-       let buttonsPressed = (1 & (input.has("ArrowUp")? 1 : 0) )|
-                (2 & (input.has("ArrowDown")? 2 : 0)) |
-                (4 & (input.has("ArrowLeft")? 4 : 0)) |
-                (8 & (input.has("ArrowRight")? 8 : 0));
+       let buttonsPressed =
+            (1 & (input.has("ArrowUp")? 1 : 0) ) |
+            (2 & (input.has("ArrowDown")? 2 : 0)) |
+            (4 & (input.has("ArrowLeft")? 4 : 0)) |
+            (8 & (input.has("ArrowRight")? 8 : 0));
         return new Uint8Array([buttonsPressed]);
     }
     let pressKey = (key) => {
         keysDown.add(key);
-        //keysDown[key] = true;
-        keyDownCounter++;
-        if(keyDownCounter === 1) {
-            keysHit.add(key);
-            //keysHit[key] = true;
-        }
-
-            socket.send(convertKeyPressesToByte(keysDown));
+        socket.send(convertKeyPressesToByte(keysDown));
     }
 
     let releaseKey = (key) => {
-        keyDownCounter = 0;
         keysDown.delete(key);
-        keysHit.delete(key);
         var input = convertKeyPressesToByte(keysDown);
-        console.log("input", input)
-            socket.send(input);
-
- //       delete keysDown[key];
-//        delete keysHit[key];
+        socket.send(input);
     };
 
     let setupKeyListeners = () => {
@@ -70,6 +51,7 @@
             releaseKey(e.key);
         }, false)
     };
+
 
     let joinGame = () => {
         socket = new WebSocket("ws://localhost:8080/join");
@@ -83,8 +65,6 @@
 
 //            output.innerHTML = "Server: " + JSON.stringify(message) + "\n";
             
-            console.log(message);
-            console.log(message[0]);
             ctx.fillStyle="#fff";
             ctx.fillRect(0,0,500,500);
             ctx.fillStyle="#000";
@@ -94,22 +74,15 @@
         };
 
         setupKeyListeners();
-        setInterval(gameLoop, 40);
+        requestAnimationFrame(gameLoop);
     };
 
 
-    function send() {
-        socket.send(input.value);
-        input.value = "";
+    let gameLoop = () => {
+        requestAnimationFrame(gameLoop);
     }
 
-    let gameLoop = () => {
-        if(keysDown.size !== 0) {
-            //console.log(keysDown.size);
-            //console.log(keysDown)
-            
-        } 
-    }
+    joinGame();
 
 </script>
     </body>

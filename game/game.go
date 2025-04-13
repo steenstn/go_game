@@ -6,7 +6,7 @@ const MAX_ENTITIES = 100
 
 var entities = make([]EntityId, MAX_ENTITIES)
 
-var playerSpeed float32 = 3.0
+var playerSpeed float32 = 5.0
 
 func AddPlayer() EntityId {
 
@@ -40,6 +40,5 @@ func Tick() *map[EntityId]*Position {
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
 	MoveStuff(PositionRegistry, VelocityRegistry, ForceRegistry)
 
-	// TODO return the position registry to the client
 	return &PositionRegistry
 }

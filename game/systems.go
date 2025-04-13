@@ -16,9 +16,7 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 				velocity.Vx = 0
 			}
 			if player.Up {
-				velocity.Vy = -playerSpeed
-			} else if player.Down {
-				velocity.Vy = playerSpeed
+				velocity.Vy -= 2
 			}
 		}
 	}
