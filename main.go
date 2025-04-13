@@ -36,7 +36,6 @@ const (
 type Client struct {
 	connection *websocket.Conn
 	connected  bool
-	player     *game.Player
 }
 
 var clients = make([]*Client, 0) // TODO: Allocate max players at start
@@ -50,6 +49,7 @@ func main() {
 		http.ServeFile(w, r, "client.html")
 	})
 
+	println("Listening")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		println(err.Error())
@@ -111,7 +111,7 @@ func inputLoop(client *Client, entityId game.EntityId) {
 			continue
 		}
 		input := msg[0]
-		game.HandleInput(client.player, input, entityId)
+		game.HandleInput(input, entityId)
 	}
 }
 
@@ -125,8 +125,8 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	newPlayer, entityId := game.AddPlayer()
-	newClient := Client{connection: conn, connected: true, player: newPlayer}
+	entityId := game.AddPlayer()
+	newClient := Client{connection: conn, connected: true}
 	clients = append(clients, &newClient)
 	go inputLoop(&newClient, entityId)
 

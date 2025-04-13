@@ -18,24 +18,14 @@ var playerSpeed = 3
 var players = make([]*Player, 0)
 var playerKeyPresses = make([]*PlayerKeyPress, 0)
 
-func AddPlayer() (*Player, EntityId) {
+func AddPlayer() EntityId {
 
 	PositionRegistry[NumEntities] = &Position{X: 50, Y: 50}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
 	NumEntities++
 
-	newPlayer := Player{
-		X:          100,
-		Y:          100,
-		Vx:         0,
-		Vy:         0,
-		keyPresses: PlayerKeyPress{},
-	}
-	players = append(players, &newPlayer)
-	playerKeyPresses = append(playerKeyPresses, &PlayerKeyPress{})
-
-	return &newPlayer, NumEntities - 1
+	return NumEntities - 1
 }
 
 type PlayerKeyPress struct {
@@ -45,19 +35,13 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
-func HandleInput(player *Player, input byte, entityId EntityId) {
+func HandleInput(input byte, entityId EntityId) {
 
 	playa := PlayerInputRegistry[entityId]
 	playa.Up = input&1 > 0
 	playa.Down = input&2 > 0
 	playa.Left = input&4 > 0
 	playa.Right = input&8 > 0
-	/*
-	   player.keyPresses.Up = input&1 > 0
-	   player.keyPresses.Down = input&2 > 0
-	   player.keyPresses.Left = input&4 > 0
-	   player.keyPresses.Right = input&8 > 0
-	*/
 }
 
 type PlayerMessage struct {
