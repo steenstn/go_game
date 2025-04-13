@@ -42,6 +42,7 @@ type Client struct {
 var clients = make([]*Client, 0) // TODO: Allocate max players at start
 
 func main() {
+
 	go gameLoop()
 
 	http.HandleFunc("/join", join)
@@ -59,11 +60,18 @@ func main() {
 func gameLoop() {
 	for {
 		game_update := game.Tick()
+
+		position_array := make([]game.Position, 0, len(*game_update))
+
+		for _, value := range *game_update {
+			position_array = append(position_array, *value)
+		}
+
 		for i := range clients {
 			if clients[i].connected == false {
 				continue
 			}
-			aaa, _ := json.Marshal(game_update)
+			aaa, _ := json.Marshal(position_array)
 			gameUpdateMessage, _ := json.Marshal(JsonMessage{
 				Type: byte(JoinMessage), Msg: aaa})
 			err := clients[i].connection.
@@ -80,7 +88,7 @@ func gameLoop() {
 	}
 }
 
-func inputLoop(client *Client) {
+func inputLoop(client *Client, entityId game.EntityId) {
 	println("Starting inputLoop")
 
 	for {
@@ -103,7 +111,7 @@ func inputLoop(client *Client) {
 			continue
 		}
 		input := msg[0]
-		game.HandleInput(client.player, input)
+		game.HandleInput(client.player, input, entityId)
 	}
 }
 
@@ -117,10 +125,10 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	newPlayer := game.AddPlayer()
+	newPlayer, entityId := game.AddPlayer()
 	newClient := Client{connection: conn, connected: true, player: newPlayer}
 	clients = append(clients, &newClient)
-	go inputLoop(&newClient)
+	go inputLoop(&newClient, entityId)
 
 	/*
 		for {

@@ -1,9 +1,5 @@
 package game
 
-import (
-	"game/queue"
-)
-
 type Player struct {
 	X          int
 	Y          int
@@ -12,12 +8,23 @@ type Player struct {
 	keyPresses PlayerKeyPress
 }
 
+var NumEntities EntityId = 0
+
+const MAX_ENTITIES = 100
+
+var entities = make([]EntityId, MAX_ENTITIES)
+
+var playerSpeed = 3
 var players = make([]*Player, 0)
 var playerKeyPresses = make([]*PlayerKeyPress, 0)
 
-var InputQueue = queue.NewQueue(10)
+func AddPlayer() (*Player, EntityId) {
 
-func AddPlayer() *Player {
+	PositionRegistry[NumEntities] = &Position{X: 50, Y: 50}
+	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
+	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
+	NumEntities++
+
 	newPlayer := Player{
 		X:          100,
 		Y:          100,
@@ -27,7 +34,8 @@ func AddPlayer() *Player {
 	}
 	players = append(players, &newPlayer)
 	playerKeyPresses = append(playerKeyPresses, &PlayerKeyPress{})
-	return &newPlayer
+
+	return &newPlayer, NumEntities - 1
 }
 
 type PlayerKeyPress struct {
@@ -37,37 +45,33 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
-// TODO Handle multipl keys being pressed, handle as numbers
-func HandleInput(player *Player, input byte) {
+func HandleInput(player *Player, input byte, entityId EntityId) {
 
-	player.keyPresses.Up = input&1 > 0
-	player.keyPresses.Down = input&2 > 0
-	player.keyPresses.Left = input&4 > 0
-	player.keyPresses.Right = input&8 > 0
-
+	playa := PlayerInputRegistry[entityId]
+	playa.Up = input&1 > 0
+	playa.Down = input&2 > 0
+	playa.Left = input&4 > 0
+	playa.Right = input&8 > 0
+	/*
+	   player.keyPresses.Up = input&1 > 0
+	   player.keyPresses.Down = input&2 > 0
+	   player.keyPresses.Left = input&4 > 0
+	   player.keyPresses.Right = input&8 > 0
+	*/
 }
 
-func Tick() []*Player {
+type PlayerMessage struct {
+	X  int
+	Y  int
+	Vx int
+	Vy int
+}
 
-	for i := range players {
-		if players[i].keyPresses.Right {
-			players[i].Vx = 1
-		} else if players[i].keyPresses.Left {
-			players[i].Vx = -1
-		} else {
-			players[i].Vx = 0
-		}
-		if players[i].keyPresses.Up {
-			players[i].Vy = -1
-		} else if players[i].keyPresses.Down {
-			players[i].Vy = 1
-		} else {
-			players[i].Vy = 0
-		}
+func Tick() *map[EntityId]*Position {
 
-		players[i].X += players[i].Vx
-		players[i].Y += players[i].Vy
-	}
+	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
+	MoveStuff(PositionRegistry, VelocityRegistry)
 
-	return players
+	// TODO return the position registry to the client
+	return &PositionRegistry
 }
