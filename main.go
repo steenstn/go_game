@@ -28,11 +28,15 @@ floats as ints
 
 */
 
-var level = [10 * 6]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+var level = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 1, 1, 0, 0, 1, 0, 1,
+	1, 0, 0, 0, 0, 0, 1, 1, 0, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 }
 
@@ -55,7 +59,8 @@ func (m *ServerFullError) Error() string {
 }
 
 const (
-	JoinMessage MessageType = 0
+	JoinMessage  MessageType = 0
+	LevelMessage MessageType = 1
 )
 
 type ClientStatus byte
@@ -104,11 +109,12 @@ func gameLoop() {
 			if clients[i] == nil || clients[i].status != Connected {
 				continue
 			}
+
 			aaa, _ := json.Marshal(position_array)
 			gameUpdateMessage, _ := json.Marshal(JsonMessage{
 				Type: byte(JoinMessage), Msg: aaa})
-			err := clients[i].connection.
-				WriteMessage(websocket.TextMessage, gameUpdateMessage)
+			err := clients[i].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
+
 			if err != nil {
 				println("Failed to write message")
 				println(err.Error())
@@ -168,6 +174,14 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	// TODO: Send level and stuff
 
 	clients[freeSlot] = &Client{connection: conn, status: Connected}
+
+	aaa, _ := json.Marshal(level)
+	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(LevelMessage), Msg: aaa})
+	err = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
+	if err != nil {
+		println(err.Error())
+		return
+	}
 
 	go inputLoop(clients[freeSlot], entityId)
 }
