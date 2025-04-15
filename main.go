@@ -14,6 +14,11 @@ import (
 
 https://github.com/0xFA11/MultiplayerNetworkingResources
 https://gafferongames.com/
+
+
+TODO:
+- Send level
+- run length encoding vs bits
 */
 
 /*
@@ -22,6 +27,14 @@ floats as ints
 0.01 = 1
 
 */
+
+var level = [10 * 6]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -45,9 +58,17 @@ const (
 	JoinMessage MessageType = 0
 )
 
+type ClientStatus byte
+
+const (
+	Disconnected ClientStatus = 0
+	Connecting   ClientStatus = 1
+	Connected    ClientStatus = 2
+)
+
 type Client struct {
 	connection *websocket.Conn
-	connected  bool
+	status     ClientStatus
 }
 
 var clients = make([]*Client, 10)
@@ -80,7 +101,7 @@ func gameLoop() {
 		}
 
 		for i := range clients {
-			if clients[i] == nil || clients[i].connected == false {
+			if clients[i] == nil || clients[i].status != Connected {
 				continue
 			}
 			aaa, _ := json.Marshal(position_array)
@@ -92,7 +113,7 @@ func gameLoop() {
 				println("Failed to write message")
 				println(err.Error())
 				println("Marking player as disconnected")
-				clients[i].connected = false
+				clients[i].status = Disconnected
 			}
 		}
 
@@ -104,14 +125,14 @@ func inputLoop(client *Client, entityId game.EntityId) {
 	println("Starting inputLoop")
 
 	for {
-		if client.connected == false {
+		if client.status != Connected {
 			break
 		}
 
 		_, msg, err := client.connection.ReadMessage()
 		if err != nil {
 			println("Input reading failed, player dropped")
-			client.connected = false
+			client.status = Disconnected
 			break
 		}
 
@@ -144,14 +165,16 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	clients[freeSlot] = &Client{connection: conn, connected: true}
+	// TODO: Send level and stuff
+
+	clients[freeSlot] = &Client{connection: conn, status: Connected}
 
 	go inputLoop(clients[freeSlot], entityId)
 }
 
 func findFreeSlot() (int, error) {
 	for i := range clients {
-		if clients[i] == nil || clients[i].connected == false {
+		if clients[i] == nil || clients[i].status == Disconnected {
 			return i, nil
 		}
 	}
