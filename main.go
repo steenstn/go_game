@@ -11,6 +11,12 @@ import (
 )
 
 /*
+
+https://github.com/0xFA11/MultiplayerNetworkingResources
+https://gafferongames.com/
+*/
+
+/*
 floats as ints
 1.2 = 120
 0.01 = 1
@@ -29,6 +35,12 @@ type JsonMessage struct {
 
 type MessageType byte
 
+type ServerFullError struct{}
+
+func (m *ServerFullError) Error() string {
+	return "Server is full"
+}
+
 const (
 	JoinMessage MessageType = 0
 )
@@ -38,7 +50,7 @@ type Client struct {
 	connected  bool
 }
 
-var clients = make([]*Client, 0) // TODO: Allocate max players at start
+var clients = make([]*Client, 10)
 
 func main() {
 
@@ -68,7 +80,7 @@ func gameLoop() {
 		}
 
 		for i := range clients {
-			if clients[i].connected == false {
+			if clients[i] == nil || clients[i].connected == false {
 				continue
 			}
 			aaa, _ := json.Marshal(position_array)
@@ -126,8 +138,23 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	}
 
 	entityId := game.AddPlayer()
-	newClient := Client{connection: conn, connected: true}
-	clients = append(clients, &newClient)
-	go inputLoop(&newClient, entityId)
+	freeSlot, err := findFreeSlot()
+	if err != nil {
+		println(err.Error())
+		return
+	}
 
+	clients[freeSlot] = &Client{connection: conn, connected: true}
+
+	go inputLoop(clients[freeSlot], entityId)
+}
+
+func findFreeSlot() (int, error) {
+	for i := range clients {
+		if clients[i] == nil || clients[i].connected == false {
+			return i, nil
+		}
+	}
+
+	return -1, &ServerFullError{}
 }

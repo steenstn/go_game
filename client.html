@@ -31,6 +31,8 @@
             (8 & (input.has("ArrowRight")? 8 : 0));
         return new Uint8Array([buttonsPressed]);
     }
+
+
     let pressKey = (key) => {
         keysDown.add(key);
         socket.send(convertKeyPressesToByte(keysDown));
