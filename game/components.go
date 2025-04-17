@@ -5,7 +5,7 @@ type EntityId int
 var PositionRegistry = make(map[EntityId]*Position)
 var VelocityRegistry = make(map[EntityId]*Velocity)
 var PlayerInputRegistry = make(map[EntityId]*PlayerKeyPress)
-var ForceRegistry = make(map[EntityId]*Force)
+var GravityRegistry = make(map[EntityId]*Force)
 
 type Position struct {
 	X float64

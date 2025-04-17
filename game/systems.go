@@ -50,11 +50,13 @@ func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRe
 			position.X += velocity.Vx
 			position.Y += velocity.Vy
 
+			// Check collision down
 			if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 1 {
 				position.Y = oldY
 				velocity.Vy = 0
 			}
 
+			// Check collision right and left
 			if velocity.Vx > 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X+5, position.Y)] == 1 {
 				position.X = oldX
 				velocity.Vx = 0

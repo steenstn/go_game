@@ -14,12 +14,6 @@ type Level struct {
 	Data   []int
 }
 
-var currentLevel = Level{
-	Width:  10,
-	Height: 10,
-	Data:   levelData,
-}
-
 var levelData = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -32,11 +26,13 @@ var levelData = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 }
 
+var CurrentLevel Level
+
 func AddPlayer() EntityId {
-	PositionRegistry[NumEntities] = &Position{X: 50, Y: 50}
+	PositionRegistry[NumEntities] = &Position{X: 60, Y: 60}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
-	ForceRegistry[NumEntities] = &Force{X: 0, Y: 1}
+	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
 
 	NumEntities++
 
@@ -50,6 +46,17 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
+func InitGame() {
+	println("Init game")
+
+	CurrentLevel.Width = 50
+	CurrentLevel.Height = 20
+	//	CurrentLevel.Data = levelData
+
+	CurrentLevel.Data = LoadLevel("game/level.txt")
+
+}
+
 func HandleInput(input byte, entityId EntityId) {
 	player := PlayerInputRegistry[entityId]
 	player.Up = input&1 > 0
@@ -61,7 +68,7 @@ func HandleInput(input byte, entityId EntityId) {
 func Tick() *map[EntityId]*Position {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
-	MoveStuff(&currentLevel, PositionRegistry, VelocityRegistry, ForceRegistry)
+	MoveStuff(&CurrentLevel, PositionRegistry, VelocityRegistry, GravityRegistry)
 
 	return &PositionRegistry
 }

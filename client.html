@@ -1,6 +1,9 @@
 <html>
     <head>
 <style>
+        body {
+            background-color: black;
+        }
         canvas {
             border: 1px solid #eee
         }
@@ -59,6 +62,9 @@
 
     };
 
+    let viewportX = 0;
+    let viewportY = 0;
+
     let joinGame = () => {
         socket = new WebSocket("ws://localhost:8080/join");
         socket.onopen = function () {
@@ -74,16 +80,15 @@
             console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
             if(type === 0) {
-                console.log("aaa")
                 ctx.fillStyle="#fff";
-               ctx.fillRect(0,0,500,500);
+                ctx.fillRect(0,0,500,500);
                 let x = 0;
                 let y = 0;
                 for(let i = 0; i < currentLevel.length; i++) {
                     ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
                     ctx.fillRect(x, y, 50, 50);
                     x+=50;
-                    if(x >= 500) {
+                    if(x >= 50*50) {
                         x = 0;
                         y +=50;
                     }

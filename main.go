@@ -28,18 +28,6 @@ floats as ints
 
 */
 
-var level = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	1, 0, 0, 1, 1, 0, 0, 1, 0, 1,
-	1, 0, 0, 0, 0, 0, 1, 1, 0, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-}
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -59,8 +47,9 @@ func (m *ServerFullError) Error() string {
 }
 
 const (
-	JoinMessage  MessageType = 0
-	LevelMessage MessageType = 1
+	JoinMessage           MessageType = 0
+	LevelMessage          MessageType = 1
+	PlayerPositionMessage MessageType = 2
 )
 
 type ClientStatus byte
@@ -80,6 +69,7 @@ var clients = make([]*Client, 10)
 
 func main() {
 
+	game.InitGame()
 	go gameLoop()
 
 	http.HandleFunc("/join", join)
@@ -111,8 +101,7 @@ func gameLoop() {
 			}
 
 			aaa, _ := json.Marshal(position_array)
-			gameUpdateMessage, _ := json.Marshal(JsonMessage{
-				Type: byte(JoinMessage), Msg: aaa})
+			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(JoinMessage), Msg: aaa})
 			err := clients[i].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 
 			if err != nil {
@@ -171,12 +160,10 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// TODO: Send level and stuff
-
 	clients[freeSlot] = &Client{connection: conn, status: Connected}
 
-	aaa, _ := json.Marshal(level)
-	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(LevelMessage), Msg: aaa})
+	currentLevelMessage, _ := json.Marshal(game.CurrentLevel.Data)
+	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(LevelMessage), Msg: currentLevelMessage})
 	err = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 	if err != nil {
 		println(err.Error())
