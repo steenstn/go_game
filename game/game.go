@@ -6,7 +6,31 @@ const MAX_ENTITIES = 100
 
 var entities = make([]EntityId, MAX_ENTITIES)
 
-var playerSpeed float32 = 5.0
+var playerSpeed float64 = 5.0
+
+type Level struct {
+	Width  int
+	Height int
+	Data   []int
+}
+
+var currentLevel = Level{
+	Width:  10,
+	Height: 10,
+	Data:   levelData,
+}
+
+var levelData = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 1, 1, 0, 0, 1, 0, 1,
+	1, 0, 0, 0, 0, 0, 1, 1, 0, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+}
 
 func AddPlayer() EntityId {
 
@@ -38,7 +62,7 @@ func HandleInput(input byte, entityId EntityId) {
 func Tick() *map[EntityId]*Position {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
-	MoveStuff(PositionRegistry, VelocityRegistry, ForceRegistry)
+	MoveStuff(&currentLevel, PositionRegistry, VelocityRegistry, ForceRegistry)
 
 	return &PositionRegistry
 }

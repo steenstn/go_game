@@ -8,16 +8,16 @@ var PlayerInputRegistry = make(map[EntityId]*PlayerKeyPress)
 var ForceRegistry = make(map[EntityId]*Force)
 
 type Position struct {
-	X float32
-	Y float32
+	X float64
+	Y float64
 }
 
 type Velocity struct {
-	Vx float32
-	Vy float32
+	Vx float64
+	Vy float64
 }
 
 type Force struct {
-	X float32
-	Y float32
+	X float64
+	Y float64
 }
