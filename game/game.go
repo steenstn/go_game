@@ -33,7 +33,6 @@ var levelData = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 }
 
 func AddPlayer() EntityId {
-
 	PositionRegistry[NumEntities] = &Position{X: 50, Y: 50}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}

@@ -33,15 +33,16 @@ func getArrayIndex(levelWidth int, tileWidth int, x float64, y float64) int {
 	return int(xPosition + yPosition)
 }
 
-func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, forceRegistry map[EntityId]*Force) {
+func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force) {
 
+	tileWidth := 50
 	for e := EntityId(0); e < NumEntities; e++ {
 		position, pOk := positionRegistry[e]
 		velocity, vOk := velocityRegistry[e]
-		force, fOk := forceRegistry[e]
+		force, fOk := gravityRegistry[e]
 
 		if pOk && vOk && fOk {
-			velocity.Vx += force.X
+
 			velocity.Vy += force.Y
 
 			oldX := position.X
@@ -49,13 +50,19 @@ func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRe
 			position.X += velocity.Vx
 			position.Y += velocity.Vy
 
-			if level.Data[getArrayIndex(level.Width, 50, position.X, position.Y)] == 1 {
-				position.X = oldX
+			if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 1 {
 				position.Y = oldY
-				velocity.Vx = 0
 				velocity.Vy = 0
-
 			}
+
+			if velocity.Vx > 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X+5, position.Y)] == 1 {
+				position.X = oldX
+				velocity.Vx = 0
+			} else if velocity.Vx < 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X-5, position.Y)] == 1 {
+				position.X = oldX
+				velocity.Vx = 0
+			}
+
 		}
 	}
 
