@@ -21,7 +21,7 @@
     c.height = 500;
     let ctx = c.getContext('2d');
   
-
+    let currentLevel = [];
     let convertKeyPressesToByte = (input) => {
        let buttonsPressed =
             (1 & (input.has("ArrowUp")? 1 : 0) ) |
@@ -75,25 +75,12 @@
             let message = JSON.parse(atob(json.Msg));
             if(type === 0) {
                 console.log("aaa")
-            console.log(message);
-//                ctx.fillStyle="#fff";
- //               ctx.fillRect(0,0,500,500);
-                ctx.fillStyle="#000";
-                for(let i = 0; i < message.length; i++) {
-                    ctx.fillRect(message[i].X, message[i].Y, 10, 10);
-                }
-            } else if(type === 1) {
-                console.log("BBB")
-                console.log(message);
                 ctx.fillStyle="#fff";
-                ctx.fillRect(0,0,500,500);
-                ctx.fillStyle="#000";
-                console.log("length", message.length)
+               ctx.fillRect(0,0,500,500);
                 let x = 0;
                 let y = 0;
-                for(let i = 0; i < message.length; i++) {
-                    console.log(message[i])
-                    ctx.fillStyle = message[i] == 0 ? "#fff" : "#000";
+                for(let i = 0; i < currentLevel.length; i++) {
+                    ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
                     ctx.fillRect(x, y, 50, 50);
                     x+=50;
                     if(x >= 500) {
@@ -102,7 +89,12 @@
                     }
 
                 }
-
+                ctx.fillStyle="#000";
+                for(let i = 0; i < message.length; i++) {
+                    ctx.fillRect(message[i].X, message[i].Y, 10, 10);
+                }
+            } else if(type === 1) {
+                currentLevel = message;
             }
         };
 
