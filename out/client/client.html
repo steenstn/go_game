@@ -86,12 +86,14 @@ let setupKeyListeners = () => {
             let type = JSON.parse(json.Type);
  //           console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
+
             //TODO make a switch
             if(type === 0) {
                 ctx.fillStyle="#fff";
                 ctx.fillRect(0,0,c.width,c.height);
                 let x = 0;
                 let y = 0;
+
                 // TODO: Optimize to only draw around the player
                 let indexStart = getArrayIndex(50, 50, playerX, playerY);
                 for(let i = indexStart; i < currentLevel.length; i++) {
@@ -102,6 +104,7 @@ let setupKeyListeners = () => {
                         x = 0;
                         y +=50;
                     }
+
 
                 }
                 ctx.fillStyle="#000";

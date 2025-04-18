@@ -1,5 +1,7 @@
 package game
 
+import "math/rand/v2"
+
 var NumEntities EntityId = 0
 
 const MAX_ENTITIES = 100
@@ -14,6 +16,8 @@ type Level struct {
 	Data   []int
 }
 
+var PlayerEntities = make([]EntityId, 0)
+
 var CurrentLevel Level
 
 func AddPlayer() EntityId {
@@ -24,6 +28,8 @@ func AddPlayer() EntityId {
 
 	NumEntities++
 
+	playerEntityId := NumEntities - 1
+	PlayerEntities = append(PlayerEntities, playerEntityId)
 	return NumEntities - 1
 }
 
@@ -34,8 +40,21 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
+func createThing(x float64, y float64) {
+	PositionRegistry[NumEntities] = &Position{X: x, Y: y}
+	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
+	AIRegistry[NumEntities] = &AIMovement{Timer: rand.IntN(100)}
+	GravityRegistry[NumEntities] = &Force{X: 0, Y: 0}
+
+	NumEntities++
+}
+
 func InitGame() {
 	println("Init game")
+	for i := 0; i < 50; i++ {
+
+		createThing(30*50, 100)
+	}
 
 	// TODO: Get this from level, don't hardcode
 	CurrentLevel.Width = 50
@@ -56,6 +75,7 @@ func HandleInput(input byte, entityId EntityId) {
 func Tick() map[EntityId]*Position {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
+	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
 	MoveStuff(&CurrentLevel, PositionRegistry, VelocityRegistry, GravityRegistry)
 
 	return PositionRegistry

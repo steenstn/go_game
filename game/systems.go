@@ -1,6 +1,9 @@
 package game
 
-import "math"
+import (
+	"math"
+	"math/rand/v2"
+)
 
 func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityRegistry map[EntityId]*Velocity) {
 
@@ -23,6 +26,53 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 		}
 	}
 
+}
+
+func distanceSquared(p1 Position, p2 Position) float64 {
+	return (p2.X-p1.X)*(p2.X-p1.X) + (p2.Y-p1.Y)*(p2.Y-p1.Y)
+}
+func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId]*Velocity, players []EntityId, positionRegistry map[EntityId]*Position) {
+	for e := EntityId(0); e < NumEntities; e++ {
+		ai, aiOk := aiRegistry[e]
+		if aiOk {
+
+			var dangerPosition = Position{}
+			aiPosition, _ := positionRegistry[e]
+			for player := 0; player < len(players); player++ {
+				playerPosition, _ := positionRegistry[players[player]]
+				if distanceSquared(*playerPosition, *aiPosition) < 8000 {
+					dangerPosition = *playerPosition
+					ai.State = 1
+				} else {
+					ai.State = 0
+				}
+			}
+			if ai.State == 1 {
+
+				velocity, _ := velocityRegistry[e]
+				escapeAngle := math.Atan2(aiPosition.Y-dangerPosition.Y, aiPosition.X-dangerPosition.X)
+
+				velocity.Vx = 7 * math.Cos(escapeAngle)
+				velocity.Vy = 7 * math.Sin(escapeAngle)
+			} else {
+
+				ai.Timer--
+				if ai.CurrentAngle > ai.TargetAngle {
+					ai.CurrentAngle -= 0.5
+				} else if ai.CurrentAngle < ai.TargetAngle {
+					ai.CurrentAngle += 0.5
+				}
+				velocity, _ := velocityRegistry[e]
+				velocity.Vx = 2 * math.Cos(ai.CurrentAngle)
+				velocity.Vy = 2 * math.Sin(ai.CurrentAngle)
+
+				if ai.Timer < 0 {
+					ai.TargetAngle = rand.Float64() * 2 * math.Pi
+					ai.Timer = rand.IntN(20)
+				}
+			}
+		}
+	}
 }
 
 func getArrayIndex(levelWidth int, tileWidth int, x float64, y float64) int {
