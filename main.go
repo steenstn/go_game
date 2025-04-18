@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"game/game"
-	"game/log"
 	"net/http"
 	"time"
 
@@ -18,6 +17,7 @@ https://gafferongames.com/
 
 
 TODO:
+- CLient side prediction /reconciliation
 - Send level
 - run length encoding vs bits
 */
@@ -71,12 +71,13 @@ var clients = make([]*Client, 10)
 
 func main() {
 
+	includeStuff("client.html")
 	game.InitGame()
 	go gameLoop()
 
 	http.HandleFunc("/join", join)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "client.html")
+		http.ServeFile(w, r, "out/client.html")
 	})
 
 	println("Listening")

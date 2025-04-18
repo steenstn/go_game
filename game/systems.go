@@ -50,16 +50,50 @@ func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRe
 			position.Y += velocity.Vy
 
 			// Check collision down
-			if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 1 {
-				position.Y = oldY
-				velocity.Vy = 0
+			if velocity.Vy > 0 {
+
+				if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 1 {
+					velocity.Vy = 0
+					collided := true
+					for range 100 {
+						position.Y--
+						if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 0 {
+							collided = false
+							break
+						}
+					}
+					// Still not out of the wall, reset to oldY
+					if collided {
+						position.Y = oldY
+					}
+
+				}
+			} else if velocity.Vy < 0 {
+
+				// Check collision up
+				if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y-2)] == 1 {
+					velocity.Vy = 0
+					collided := true
+					for range 100 {
+						position.Y++
+						if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y-2)] == 0 {
+							collided = false
+							break
+						}
+					}
+					// Still not out of the wall, reset to oldY
+					if collided {
+						position.Y = oldY
+					}
+
+				}
 			}
 
 			// Check collision right and left
 			if velocity.Vx > 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X+5, position.Y)] == 1 {
 				position.X = oldX
 				velocity.Vx = 0
-			} else if velocity.Vx < 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X-5, position.Y)] == 1 {
+			} else if velocity.Vx < 0 && level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y)] == 1 {
 				position.X = oldX
 				velocity.Vx = 0
 			}

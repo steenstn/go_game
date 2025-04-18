@@ -23,11 +23,54 @@
     c.width = 500;
     c.height = 500;
     let ctx = c.getContext('2d');
-
-    // #include "functions.js"
-    // #include "input.js"
-
+  
     let currentLevel = [];
+
+let convertKeyPressesToByte = (input) => {
+   let buttonsPressed =
+        (1 & (input.has("ArrowUp")? 1 : 0) ) |
+        (2 & (input.has("ArrowDown")? 2 : 0)) |
+        (4 & (input.has("ArrowLeft")? 4 : 0)) |
+        (8 & (input.has("ArrowRight")? 8 : 0));
+    return new Uint8Array([buttonsPressed]);
+}
+
+
+let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+    let xPos = Math.floor(x / tileWidth);
+    let yPos = levelWidth * Math.floor(y/tileWidth);
+    let res = Math.floor(xPos + yPos);
+    if(res < 0) {
+        res = 0;
+    }
+    return 0;
+}
+let pressKey = (key) => {
+    keysDown.add(key);
+    socket.send(convertKeyPressesToByte(keysDown));
+}
+
+let releaseKey = (key) => {
+    keysDown.delete(key);
+    var input = convertKeyPressesToByte(keysDown);
+    socket.send(input);
+};
+
+let setupKeyListeners = () => {
+    addEventListener("keydown", (e) => {
+        pressKey(e.key);
+    }, false);
+
+    addEventListener("keyup", (e) => {
+        releaseKey(e.key);
+    }, false)
+};
+
+
+    let handleMessage = (message) => {
+
+
+    };
 
     let viewportX = 0;
     let viewportY = 0;
