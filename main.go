@@ -22,6 +22,7 @@ TODO:
 - run length encoding vs bits
 - Remove player if they disconnect
 - chat?
+- Nicer camera movement
 
 BUG
 - Player can drop outside of level
@@ -76,13 +77,13 @@ var clients = make([]*Client, 10)
 
 func main() {
 
-	includeStuff("client.html")
+	includeStuff("client/client.html")
 	game.InitGame()
 	go gameLoop()
 
 	http.HandleFunc("/join", join)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "out/client.html")
+		http.ServeFile(w, r, "out/client/client.html")
 	})
 
 	println("Listening")
@@ -168,13 +169,13 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	entityId := game.AddPlayer()
 	freeSlot, err := findFreeSlot(clients)
 	if err != nil {
 		println(err.Error())
 		return
 	}
 
+	entityId := game.AddPlayer()
 	clients[freeSlot] = &Client{connection: conn, status: Connected, entityId: entityId}
 
 	currentLevelMessage, _ := json.Marshal(game.CurrentLevel.Data)

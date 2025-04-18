@@ -24,8 +24,8 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
-    // #include "functions.js"
-    // #include "input.js"
+    // #include "client/functions.js"
+    // #include "client/input.js"
 
     let currentLevel = [];
 
@@ -48,12 +48,14 @@
             let type = JSON.parse(json.Type);
  //           console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
+
             //TODO make a switch
             if(type === 0) {
                 ctx.fillStyle="#fff";
                 ctx.fillRect(0,0,c.width,c.height);
                 let x = 0;
                 let y = 0;
+
                 // TODO: Optimize to only draw around the player
                 let indexStart = getArrayIndex(50, 50, playerX, playerY);
                 for(let i = indexStart; i < currentLevel.length; i++) {

@@ -43,7 +43,6 @@ func InitGame() {
 
 	println("Loading level")
 	CurrentLevel.Data = LoadLevel("game/level.txt")
-
 }
 
 func HandleInput(input byte, entityId EntityId) {
