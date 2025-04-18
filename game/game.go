@@ -17,7 +17,7 @@ type Level struct {
 var CurrentLevel Level
 
 func AddPlayer() EntityId {
-	PositionRegistry[NumEntities] = &Position{X: 60, Y: 60}
+	PositionRegistry[NumEntities] = &Position{X: 40 * 50, Y: 60}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
 	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}

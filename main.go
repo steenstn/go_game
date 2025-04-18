@@ -20,6 +20,8 @@ TODO:
 - CLient side prediction /reconciliation
 - Send level
 - run length encoding vs bits
+- Remove player if they disconnect
+- chat?
 */
 
 /*
@@ -104,7 +106,6 @@ func gameLoop() {
 			}
 
 			// Send player position
-
 			playerPosition, _ := json.Marshal(game_update[clients[i].entityId])
 
 			playerPositionMessage, _ := json.Marshal(JsonMessage{Type: byte(PlayerPositionMessage), Msg: playerPosition})
@@ -165,7 +166,7 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	}
 
 	entityId := game.AddPlayer()
-	freeSlot, err := findFreeSlot()
+	freeSlot, err := findFreeSlot(clients)
 	if err != nil {
 		println(err.Error())
 		return
@@ -184,9 +185,9 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	go inputLoop(clients[freeSlot], entityId)
 }
 
-func findFreeSlot() (int, error) {
-	for i := range clients {
-		if clients[i] == nil || clients[i].status == Disconnected {
+func findFreeSlot(clientArray []*Client) (int, error) {
+	for i := range clientArray {
+		if clientArray[i] == nil || clientArray[i].status == Disconnected {
 			return i, nil
 		}
 	}

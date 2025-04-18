@@ -20,11 +20,9 @@
     let keysDown = new Set();
 
     let c = document.getElementById('c');
-    c.width = 500;
-    c.height = 500;
+    c.width = window.innerWidth-50;
+    c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
-  
-    let currentLevel = [];
 
 let convertKeyPressesToByte = (input) => {
    let buttonsPressed =
@@ -67,10 +65,7 @@ let setupKeyListeners = () => {
 };
 
 
-    let handleMessage = (message) => {
-
-
-    };
+    let currentLevel = [];
 
     let viewportX = 0;
     let viewportY = 0;
@@ -94,7 +89,7 @@ let setupKeyListeners = () => {
             //TODO make a switch
             if(type === 0) {
                 ctx.fillStyle="#fff";
-                ctx.fillRect(0,0,500,500);
+                ctx.fillRect(0,0,c.width,c.height);
                 let x = 0;
                 let y = 0;
                 // TODO: Optimize to only draw around the player
@@ -118,8 +113,10 @@ let setupKeyListeners = () => {
             } else if (type === 2) {
                 playerX = message.X;
                 playerY = message.Y;
-                viewportX = playerX-200;
-                viewportY = playerY-200;
+                viewportX = Math.max(1, playerX-c.width/2);
+                viewportX = Math.min(50*50-(c.width),viewportX);
+                viewportY = Math.max(1, playerY-c.height/2);
+                viewportY = Math.min(50*20-(c.height),viewportY);
             }
         };
 
