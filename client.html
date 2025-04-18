@@ -35,6 +35,16 @@
     }
 
 
+    let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+        let xPos = Math.floor(x / tileWidth);
+        let yPos = levelWidth * Math.floor(y/tileWidth);
+        let res = Math.floor(xPos + yPos);
+        if(res < 0) {
+            res = 0;
+        }
+        return 0;
+    }
+
     let pressKey = (key) => {
         keysDown.add(key);
         socket.send(convertKeyPressesToByte(keysDown));
@@ -64,6 +74,8 @@
 
     let viewportX = 0;
     let viewportY = 0;
+    let playerX = 0;
+    let playerY = 0;
 
     let joinGame = () => {
         socket = new WebSocket("ws://localhost:8080/join");
@@ -75,18 +87,20 @@
             //console.log(atob(JSON.parse(e.data).Msg))
 
             let json = JSON.parse(e.data);
-            console.log("Type", json.Type)
+//            console.log("Type", json.Type)
             let type = JSON.parse(json.Type);
-            console.log("type", type)
+ //           console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
             if(type === 0) {
                 ctx.fillStyle="#fff";
                 ctx.fillRect(0,0,500,500);
                 let x = 0;
                 let y = 0;
-                for(let i = 0; i < currentLevel.length; i++) {
+                // TODO: Optimize to only draw around the player
+                let indexStart = getArrayIndex(50, 50, playerX, playerY);
+                for(let i = indexStart; i < currentLevel.length; i++) {
                     ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
-                    ctx.fillRect(x, y, 50, 50);
+                    ctx.fillRect(-viewportX + x, -viewportY + y, 50, 50);
                     x+=50;
                     if(x >= 50*50) {
                         x = 0;
@@ -96,10 +110,15 @@
                 }
                 ctx.fillStyle="#000";
                 for(let i = 0; i < message.length; i++) {
-                    ctx.fillRect(message[i].X, message[i].Y, 10, 10);
+                    ctx.fillRect(-viewportX + message[i].X, -viewportY + message[i].Y, 10, 10);
                 }
             } else if(type === 1) {
                 currentLevel = message;
+            } else if (type === 2) {
+                playerX = message.X;
+                playerY = message.Y;
+                viewportX = playerX-200;
+                viewportY = playerY-200;
             }
         };
 

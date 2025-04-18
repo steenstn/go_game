@@ -2,8 +2,6 @@ package queue
 
 import "sync"
 
-// TODO make generic
-
 /*
 Queue that uses a "circular array"
 */

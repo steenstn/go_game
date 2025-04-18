@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"game/game"
+	"game/log"
 	"net/http"
 	"time"
 
@@ -63,6 +64,7 @@ const (
 type Client struct {
 	connection *websocket.Conn
 	status     ClientStatus
+	entityId   game.EntityId
 }
 
 var clients = make([]*Client, 10)
@@ -89,9 +91,9 @@ func gameLoop() {
 	for {
 		game_update := game.Tick()
 
-		position_array := make([]game.Position, 0, len(*game_update))
+		position_array := make([]game.Position, 0, len(game_update))
 
-		for _, value := range *game_update {
+		for _, value := range game_update {
 			position_array = append(position_array, *value)
 		}
 
@@ -100,8 +102,16 @@ func gameLoop() {
 				continue
 			}
 
-			aaa, _ := json.Marshal(position_array)
-			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(JoinMessage), Msg: aaa})
+			// Send player position
+
+			playerPosition, _ := json.Marshal(game_update[clients[i].entityId])
+
+			playerPositionMessage, _ := json.Marshal(JsonMessage{Type: byte(PlayerPositionMessage), Msg: playerPosition})
+			clients[i].connection.WriteMessage(websocket.TextMessage, playerPositionMessage)
+
+			// Send all positions
+			positions, _ := json.Marshal(position_array)
+			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(JoinMessage), Msg: positions})
 			err := clients[i].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 
 			if err != nil {
@@ -131,7 +141,7 @@ func inputLoop(client *Client, entityId game.EntityId) {
 			break
 		}
 
-		fmt.Printf("input: %b\n", msg)
+		//fmt.Printf("input: %b\n", msg)
 		if len(msg) > 1 {
 			println("Input message is too long, dropping")
 			println(string(msg))
@@ -160,7 +170,7 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	clients[freeSlot] = &Client{connection: conn, status: Connected}
+	clients[freeSlot] = &Client{connection: conn, status: Connected, entityId: entityId}
 
 	currentLevelMessage, _ := json.Marshal(game.CurrentLevel.Data)
 	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(LevelMessage), Msg: currentLevelMessage})

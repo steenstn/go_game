@@ -25,7 +25,6 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 
 }
 
-// TODO: Ska det inte vara en pekare här? Eller är det redan det?
 func getArrayIndex(levelWidth int, tileWidth int, x float64, y float64) int {
 	xPosition := math.Floor(x / float64(tileWidth))
 	yPosition := float64(levelWidth) * math.Floor(y/float64(tileWidth))
