@@ -6,7 +6,7 @@ const MAX_ENTITIES = 100
 
 var entities = make([]EntityId, MAX_ENTITIES)
 
-var playerSpeed float64 = 6.0
+var playerSpeed float64 = 7.0
 
 type Level struct {
 	Width  int

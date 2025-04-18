@@ -22,6 +22,9 @@ TODO:
 - run length encoding vs bits
 - Remove player if they disconnect
 - chat?
+
+BUG
+- Player can drop outside of level
 */
 
 /*
