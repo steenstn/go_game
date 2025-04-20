@@ -51,8 +51,7 @@ func createThing(x float64, y float64) {
 
 func InitGame() {
 	println("Init game")
-	for i := 0; i < 50; i++ {
-
+	for range 10 {
 		createThing(30*50, 100)
 	}
 

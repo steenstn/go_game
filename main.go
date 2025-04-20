@@ -23,6 +23,7 @@ TODO:
 - Remove player if they disconnect
 - chat?
 - Nicer camera movement
+- Spider spider.html
 
 BUG
 - Player can drop outside of level
@@ -155,6 +156,8 @@ func inputLoop(client *Client, entityId game.EntityId) {
 			continue
 		}
 		input := msg[0]
+		time.Sleep(300 * time.Millisecond)
+
 		game.HandleInput(input, entityId)
 	}
 }

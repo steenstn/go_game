@@ -2,34 +2,34 @@
     <head>
     </head>
     <body>
-        <canvas id="c"></canvas>
-<script>
+        <script src ="client/functions.js"></script>
+        <script>
+        let assert = (condition, message) => {
+            if(!condition) {
+                throw new Error(message || "Assertion failed");
+            }
+        }
+        let test = new Queue(3);
+        test.push(1);
+        test.push(2);
+        test.push(3);
 
-    let c = document.getElementById('c');
-    c.width = 500;
-    c.height = 500;
-    let ctx = c.getContext('2d');
+        console.log(test.data)
+        assert(test.pop() == 1, "First should be 1")
+        assert(test.pop() == 2, "First should be 2")
+        assert(test.pop() == 3, "First should be 3")
 
-    let keysDown = new Set();
-        addEventListener("keydown", (e) => {
-        keysDown.add(e.key);
-            console.log(e.key)
-            let value = (1 & (keysDown.has("ArrowUp")? 1 : 0) )|
-                        (2 & (keysDown.has("ArrowDown")? 2 : 0)) |
-                        (4 & (keysDown.has("ArrowLeft")? 4 : 0)) |
-                        (8 & (keysDown.has("ArrowRight")? 8 : 0));
-        console.log(value);
-        }, false);
 
-        addEventListener("keyup", (e) => {
+        test.push(1);
+        test.push(2);
+        test.push(3);
+        test.push(4);
 
-        keysDown.delete(e.key);
-            let value = (1 & (keysDown.has("ArrowUp")? 1 : 0) )|
-                        (2 & (keysDown.has("ArrowDown")? 2 : 0)) |
-                        (4 & (keysDown.has("ArrowLeft")? 4 : 0)) |
-                        (8 & (keysDown.has("ArrowRight")? 8 : 0));
-        console.log(value);
-    })
+        assert(test.pop() == 2, "First should be 2. Should be pushed out")
+        assert(test.pop() == 3, "First should be 3")
+        assert(test.pop() == 4, "First should be 4")
+        
+
         </script>
     </body>
 </html>

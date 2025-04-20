@@ -31,6 +31,7 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 func distanceSquared(p1 Position, p2 Position) float64 {
 	return (p2.X-p1.X)*(p2.X-p1.X) + (p2.Y-p1.Y)*(p2.Y-p1.Y)
 }
+
 func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId]*Velocity, players []EntityId, positionRegistry map[EntityId]*Position) {
 	for e := EntityId(0); e < NumEntities; e++ {
 		ai, aiOk := aiRegistry[e]
@@ -38,7 +39,7 @@ func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId
 
 			var dangerPosition = Position{}
 			aiPosition, _ := positionRegistry[e]
-			for player := 0; player < len(players); player++ {
+			for player := range players {
 				playerPosition, _ := positionRegistry[players[player]]
 				if distanceSquared(*playerPosition, *aiPosition) < 8000 {
 					dangerPosition = *playerPosition
@@ -67,7 +68,7 @@ func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId
 				velocity.Vy = 2 * math.Sin(ai.CurrentAngle)
 
 				if ai.Timer < 0 {
-					ai.TargetAngle = rand.Float64() * 2 * math.Pi
+					ai.TargetAngle = rand.Float64() * 2.1 * math.Pi
 					ai.Timer = rand.IntN(20)
 				}
 			}
