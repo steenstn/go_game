@@ -15,9 +15,13 @@ import (
 https://github.com/0xFA11/MultiplayerNetworkingResources
 https://gafferongames.com/
 
+CLient reconciliation
+https://www.gabrielgambetta.com/client-server-game-architecture.html
+
 
 TODO:
 - CLient side prediction /reconciliation
+	- Try and reset the counter at some point.
 - Send level
 - run length encoding vs bits
 - Remove player if they disconnect

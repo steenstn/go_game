@@ -26,6 +26,7 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
+    let requestNumber = 0;
 let convertKeyPressesToByte = (input) => {
    let buttonsPressed =
         (1 & (input.has("ArrowUp")? 1 : 0) ) |
@@ -46,28 +47,43 @@ let getArrayIndex = (levelWidth, tileWidth, x, y) => {
     return 0;
 }
 
+// Circular array queue
 class Queue {
     
     constructor(size) {
         this.size = size;
-        // TODO allocate this to size on init
-        this.data = [];
+        this.data = new Array(size);
         this.tail = 0;
         this.head = 0;
         this.numEntries = 0;
     }
 
+    // Push a value. Pushing past the capacity overwrites the oldest value
     push(value) {
-        this.data.push(value);
+        if(this.numEntries >= this.data.length) {
+            this.head = (this.head + 1) % (this.data.length);
+        }
+        this.data[this.tail] = value;
+        this.tail = (this.tail + 1) % this.data.length;
+        this.numEntries++;
+        return true;
     }
 
     pop() {
-        return this.data[0];
+        if(this.numEntries <=0) {
+            return null;
+        }
+        let value = this.data[this.head];
+        this.head = (this.head + 1) % (this.data.length);
+        this.numEntries--;
+        return value;
     }
 }
 let pressKey = (key) => {
     keysDown.add(key);
     socket.send(convertKeyPressesToByte(keysDown));
+requestNumber++;
+    console.log(requestNumber);
 }
 
 let releaseKey = (key) => {

@@ -14,6 +14,7 @@
 <pre id="output"></pre>
 <script>
     "use strict";
+    // #include "client/queue.js"
     let input = document.getElementById("input");
     let output = document.getElementById("output");
     let socket;
@@ -26,6 +27,7 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
+    let requestNumber = 0;
     // #include "client/functions.js"
     // #include "client/input.js"
 

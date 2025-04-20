@@ -1,6 +1,8 @@
 let pressKey = (key) => {
     keysDown.add(key);
     socket.send(convertKeyPressesToByte(keysDown));
+requestNumber++;
+    console.log(requestNumber);
 }
 
 let releaseKey = (key) => {
