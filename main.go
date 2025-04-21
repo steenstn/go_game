@@ -24,6 +24,7 @@ TODO:
 	- Try and reset the counter at some point.
 - Store entities locally?
 - Send level and other information on start
+  - Connecting state on client to get all the required data up front
 - run length encoding vs bits
 - Remove player if they disconnect
 - chat?
@@ -60,7 +61,7 @@ func (m *ServerFullError) Error() string {
 }
 
 const (
-	JoinMessage           MessageType = 0
+	GameUpdateMessage     MessageType = 0
 	LevelMessage          MessageType = 1
 	PlayerPositionMessage MessageType = 2
 )
@@ -123,7 +124,7 @@ func gameLoop() {
 
 			// Send all positions
 			positions, _ := json.Marshal(position_array)
-			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(JoinMessage), Msg: positions})
+			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(GameUpdateMessage), Msg: positions})
 			err := clients[i].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 
 			if err != nil {

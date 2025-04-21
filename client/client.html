@@ -14,6 +14,7 @@
 <pre id="output"></pre>
 <script>
     "use strict";
+    // #include "client/constants.js"
     // #include "client/queue.js"
     let input = document.getElementById("input");
     let output = document.getElementById("output");
@@ -63,21 +64,23 @@
  //           console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
 
-            //TODO make a switch
-            if(type === 0) {
-                //ctx.fillStyle="#fff";
-                //ctx.fillStyle="#fff";
-                entities = [];
-                for(let i = 0; i < message.length; i++) {
-                    entities.push({x: message[i].X, y: message[i].Y});
-                    //ctx.fillRect(-viewportX + message[i].X, -viewportY + message[i].Y, 10, 10);
-                }
-            } else if(type === 1) {
-                currentLevel = message;
-            } else if (type === 2) {
-                playerX = message.X;
-                playerY = message.Y;
-
+            switch(type) {
+                case GameUpdateMessage:
+                    // TODO Do not reallocate this every time
+                    entities = [];
+                    for(let i = 0; i < message.length; i++) {
+                        entities.push({x: message[i].X, y: message[i].Y});
+                    }
+                    break;
+                case LevelMessage:
+                    currentLevel = message;
+                    break;
+                case PlayerPositionMessage:
+                    playerX = message.X;
+                    playerY = message.Y;
+                    break;
+                default:
+                    throw "Unhandled type " + type;
             }
         };
 
