@@ -1,14 +1,20 @@
+let sendKeys = () =>  {
+    let input = convertKeyPressesToByte(keysDown);
+    let data = {Num: requestNumber, Input: input[0]};
+    inputHistory.push(data);
+    requestNumber++;
+
+    socket.send(JSON.stringify(data));
+}
+
 let pressKey = (key) => {
     keysDown.add(key);
-    socket.send(convertKeyPressesToByte(keysDown));
-requestNumber++;
-    console.log(requestNumber);
+    sendKeys();
 }
 
 let releaseKey = (key) => {
     keysDown.delete(key);
-    var input = convertKeyPressesToByte(keysDown);
-    socket.send(input);
+    sendKeys();
 };
 
 let setupKeyListeners = () => {

@@ -14,39 +14,6 @@
 <pre id="output"></pre>
 <script>
     "use strict";
-    let input = document.getElementById("input");
-    let output = document.getElementById("output");
-    let socket;
-    let keysDown = new Set();
-    let dt = 0;
-    let lastFrame = new Date();
-
-    let c = document.getElementById('c');
-    c.width = window.innerWidth-50;
-    c.height = window.innerHeight-50;
-    let ctx = c.getContext('2d');
-
-    let requestNumber = 0;
-let convertKeyPressesToByte = (input) => {
-   let buttonsPressed =
-        (1 & (input.has("ArrowUp")? 1 : 0) ) |
-        (2 & (input.has("ArrowDown")? 2 : 0)) |
-        (4 & (input.has("ArrowLeft")? 4 : 0)) |
-        (8 & (input.has("ArrowRight")? 8 : 0));
-    return new Uint8Array([buttonsPressed]);
-}
-
-
-let getArrayIndex = (levelWidth, tileWidth, x, y) => {
-    let xPos = Math.floor(x / tileWidth);
-    let yPos = levelWidth * Math.floor(y/tileWidth);
-    let res = Math.floor(xPos + yPos);
-    if(res < 0) {
-        res = 0;
-    }
-    return 0;
-}
-
 // Circular array queue
 class Queue {
     
@@ -79,17 +46,55 @@ class Queue {
         return value;
     }
 }
+    let input = document.getElementById("input");
+    let output = document.getElementById("output");
+    let socket;
+    let keysDown = new Set();
+    let dt = 0;
+    let lastFrame = new Date();
+
+    let c = document.getElementById('c');
+    c.width = window.innerWidth-50;
+    c.height = window.innerHeight-50;
+    let ctx = c.getContext('2d');
+
+    let inputHistory = [];
+    let requestNumber = 0;
+let convertKeyPressesToByte = (input) => {
+   let buttonsPressed =
+        (1 & (input.has("ArrowUp")? 1 : 0) ) |
+        (2 & (input.has("ArrowDown")? 2 : 0)) |
+        (4 & (input.has("ArrowLeft")? 4 : 0)) |
+        (8 & (input.has("ArrowRight")? 8 : 0));
+    return new Uint8Array([buttonsPressed]);
+}
+
+let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+    let xPos = Math.floor(x / tileWidth);
+    let yPos = levelWidth * Math.floor(y/tileWidth);
+    let res = Math.floor(xPos + yPos);
+    if(res < 0) {
+        res = 0;
+    }
+    return 0;
+}
+let sendKeys = () =>  {
+    let input = convertKeyPressesToByte(keysDown);
+    let data = {Num: requestNumber, Input: input[0]};
+    inputHistory.push(data);
+    requestNumber++;
+
+    socket.send(JSON.stringify(data));
+}
+
 let pressKey = (key) => {
     keysDown.add(key);
-    socket.send(convertKeyPressesToByte(keysDown));
-requestNumber++;
-    console.log(requestNumber);
+    sendKeys();
 }
 
 let releaseKey = (key) => {
     keysDown.delete(key);
-    var input = convertKeyPressesToByte(keysDown);
-    socket.send(input);
+    sendKeys();
 };
 
 let setupKeyListeners = () => {
@@ -110,6 +115,7 @@ let setupKeyListeners = () => {
     let playerX = 0;
     let playerY = 0;
 
+    let entities = [];
 
     let rx = [];
     let ry = [];

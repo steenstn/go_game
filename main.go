@@ -22,6 +22,7 @@ https://www.gabrielgambetta.com/client-server-game-architecture.html
 TODO:
 - CLient side prediction /reconciliation
 	- Try and reset the counter at some point.
+- Store entities locally?
 - Send level
 - run length encoding vs bits
 - Remove player if they disconnect
@@ -30,7 +31,7 @@ TODO:
 - Spider spider.html
 
 BUG
-- Player can drop outside of level
+- Player can drop outside of level - What to do if user fetches outside array?
 */
 
 /*
@@ -137,6 +138,11 @@ func gameLoop() {
 	}
 }
 
+type Input struct {
+	Num   int
+	Input byte
+}
+
 func inputLoop(client *Client, entityId game.EntityId) {
 	println("Starting inputLoop")
 
@@ -153,16 +159,22 @@ func inputLoop(client *Client, entityId game.EntityId) {
 		}
 
 		//fmt.Printf("input: %b\n", msg)
-		if len(msg) > 1 {
+		// TODO: Validate
+		/*if len(msg) > 1 {
 			println("Input message is too long, dropping")
 			println(string(msg))
 			println("--")
 			continue
-		}
-		input := msg[0]
-		time.Sleep(300 * time.Millisecond)
+		}*/
+		parsedInput := Input{}
+		json.Unmarshal(msg, &parsedInput)
+		//input := msg[0]
+		fmt.Printf("input: %b\n", parsedInput)
+		println(parsedInput.Num)
+		println(parsedInput.Input)
+		//time.Sleep(300 * time.Millisecond)
 
-		game.HandleInput(input, entityId)
+		game.HandleInput(parsedInput.Input, entityId)
 	}
 }
 
