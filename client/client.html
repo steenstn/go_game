@@ -66,9 +66,11 @@
             //TODO make a switch
             if(type === 0) {
                 //ctx.fillStyle="#fff";
-                ctx.fillStyle="#fff";
+                //ctx.fillStyle="#fff";
+                entities = [];
                 for(let i = 0; i < message.length; i++) {
-                    ctx.fillRect(-viewportX + message[i].X, -viewportY + message[i].Y, 10, 10);
+                    entities.push({x: message[i].X, y: message[i].Y});
+                    //ctx.fillRect(-viewportX + message[i].X, -viewportY + message[i].Y, 10, 10);
                 }
             } else if(type === 1) {
                 currentLevel = message;
@@ -135,6 +137,12 @@
                 }
 
             }
+
+        
+        ctx.fillStyle = "#fff";
+        for(let i = 0; i < entities.length; i++) {
+            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 10, 10);
+        }
                 // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
                 viewportX = Math.max(1, playerX-c.width/2);
                 viewportX = Math.min(50*50-(c.width),viewportX);

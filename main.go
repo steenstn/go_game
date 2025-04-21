@@ -23,7 +23,7 @@ TODO:
 - CLient side prediction /reconciliation
 	- Try and reset the counter at some point.
 - Store entities locally?
-- Send level
+- Send level and other information on start
 - run length encoding vs bits
 - Remove player if they disconnect
 - chat?
