@@ -5,6 +5,8 @@ import (
 	"math/rand/v2"
 )
 
+const TileWidth = 50
+
 func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityRegistry map[EntityId]*Velocity) {
 
 	for e := EntityId(0); e < NumEntities; e++ {
@@ -83,9 +85,8 @@ func getArrayIndex(levelWidth int, tileWidth int, x float64, y float64) int {
 	return int(xPosition + yPosition)
 }
 
-func MoveStuff(level *Level, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force) {
+func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force) {
 
-	tileWidth := 50
 	for e := EntityId(0); e < NumEntities; e++ {
 		position, pOk := positionRegistry[e]
 		velocity, vOk := velocityRegistry[e]

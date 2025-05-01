@@ -16,8 +16,13 @@
     "use strict";
 // The types of messages that the server can send
 const GameUpdateMessage = 0;
-const LevelMessage = 1;
+const SetupMessage = 1;
 const PlayerPositionMessage = 2;
+
+// Subtypes for setup messages
+const SetupMessageSubType_Level = 0;
+const SetupMessageSubType_PlayerSprite = 1;
+const SetupMessageSubType_LevelTileset = 2;
 // Circular array queue
 class Queue {
     
@@ -121,6 +126,10 @@ let setupKeyListeners = () => {
 
     let entities = [];
 
+
+    let playerSpriteImage = new Image();
+    let levelTilesetImage = new Image();
+
     let rx = [];
     let ry = [];
     for(let i = 0; i < 50; i++) {
@@ -140,6 +149,8 @@ let setupKeyListeners = () => {
             let json = JSON.parse(e.data);
 //            console.log("Type", json.Type)
             let type = JSON.parse(json.Type);
+            let subType = JSON.parse(json.SubType);
+            console.log("subtype", subType);
  //           console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
 
@@ -151,8 +162,14 @@ let setupKeyListeners = () => {
                         entities.push({x: message[i].X, y: message[i].Y});
                     }
                     break;
-                case LevelMessage:
-                    currentLevel = message;
+                case SetupMessage:
+                    if(subType === SetupMessageSubType_Level) {
+                        currentLevel = message;
+                    } else if(subType === SetupMessageSubType_PlayerSprite) {
+                        playerSpriteImage.src = 'data:image/png;base64,' + message;
+                    } else if(subType === SetupMessageSubType_LevelTileset) {
+                        levelTilesetImage.src = 'data:image/png;base64,' + message;
+                    }
                     break;
                 case PlayerPositionMessage:
                     playerX = message.X;
@@ -164,12 +181,12 @@ let setupKeyListeners = () => {
         };
 
         setupKeyListeners();
-        setTimeout(gameLoop, 1);
+        setTimeout(gameLoop, 10);
     };
 
 
     let loadingLoop = () => {
-
+        console.log("LOading stuff")
     }
 
     let rain = () => {
@@ -201,7 +218,7 @@ let setupKeyListeners = () => {
         if(keysDown.has("ArrowRight")) {
             playerX+=3;
         }
-            ctx.fillStyle="#000";
+            ctx.fillStyle="#72727f";
             ctx.fillRect(0,0,c.width,c.height);
             let x = 0;
             let y = 0;
@@ -211,7 +228,10 @@ let setupKeyListeners = () => {
             for(let i = indexStart; i < currentLevel.length; i++) {
                 //ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
                 ctx.fillStyle = currentLevel[i] == 0 ? "#000" : "#fff";
-                ctx.fillRect(Math.floor(-viewportX + x), Math.floor(-viewportY + y), 50, 50);
+                if(currentLevel[i]=== 1) {
+                    ctx.drawImage(levelTilesetImage, Math.floor(-viewportX + x), Math.floor(-viewportY + y));
+                }
+                //ctx.fillRect(Math.floor(-viewportX + x), Math.floor(-viewportY + y), 50, 50);
                 x+=50;
                 if(x >= 50*50) {
                     x = 0;
@@ -223,7 +243,8 @@ let setupKeyListeners = () => {
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
-            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 10, 10);
+            ctx.drawImage(playerSpriteImage, 0,0, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
+            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 10, 10);
         }
                 // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
                 viewportX = Math.max(1, playerX-c.width/2);
@@ -231,6 +252,7 @@ let setupKeyListeners = () => {
                 viewportY = Math.max(1, playerY-c.height/2);
                 viewportY = Math.min(50*20-(c.height),viewportY);
 
+        //ctx.drawImage(playerSpriteImage, 10,10);
         setTimeout(gameLoop, 50);
 
         //requestAnimationFrame(gameLoop);

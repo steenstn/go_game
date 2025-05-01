@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"game/game"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -29,6 +30,7 @@ TODO:
 - Remove player if they disconnect
 - chat?
 - Nicer camera movement
+- Refactor creating of entities, don't want to manually increase numEntities etc
 - Spider spider.html
 
 BUG
@@ -48,11 +50,10 @@ var upgrader = websocket.Upgrader{
 }
 
 type JsonMessage struct {
-	Type byte
-	Msg  []byte
+	Type    byte
+	SubType byte
+	Msg     []byte
 }
-
-type MessageType byte
 
 type ServerFullError struct{}
 
@@ -60,9 +61,11 @@ func (m *ServerFullError) Error() string {
 	return "Server is full"
 }
 
+type MessageType byte
+
 const (
 	GameUpdateMessage     MessageType = 0
-	LevelMessage          MessageType = 1
+	SetupMessage          MessageType = 1
 	PlayerPositionMessage MessageType = 2
 )
 
@@ -74,6 +77,14 @@ const (
 	Connected    ClientStatus = 2
 )
 
+type SetupMessageSubType byte
+
+const (
+	Level        SetupMessageSubType = 0
+	PlayerSprite SetupMessageSubType = 1
+	LevelTileset SetupMessageSubType = 2
+)
+
 type Client struct {
 	connection *websocket.Conn
 	status     ClientStatus
@@ -82,9 +93,13 @@ type Client struct {
 
 var clients = make([]*Client, 10)
 
+var playerSprite, _ = os.ReadFile("playersprite.png")
+var levelTileset, _ = os.ReadFile("tileset.png")
+
 func main() {
 
 	includeStuff("client/client.html")
+
 	game.InitGame()
 	go gameLoop()
 
@@ -199,14 +214,45 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	clients[freeSlot] = &Client{connection: conn, status: Connected, entityId: entityId}
 
 	currentLevelMessage, _ := json.Marshal(game.CurrentLevel.Data)
-	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(LevelMessage), Msg: currentLevelMessage})
+	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(Level), Msg: currentLevelMessage})
 	err = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 	if err != nil {
 		println(err.Error())
 		return
 	}
 
+	playerSpriteMessage, _ := json.Marshal(playerSprite)
+	jsonMessage, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(PlayerSprite), Msg: playerSpriteMessage})
+
+	_ = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, jsonMessage)
+
+	tilesetMessage, _ := json.Marshal(levelTileset)
+	tileSetJson, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(LevelTileset), Msg: tilesetMessage})
+
+	_ = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, tileSetJson)
+
 	go inputLoop(clients[freeSlot], entityId)
+}
+
+/*
+Loop to download all assets
+*/
+func connectionLoop(client *Client) {
+	println("Starting connection loop")
+
+	for {
+		if client.status != Connecting {
+			break
+		}
+
+		_, msg, err := client.connection.ReadMessage()
+		if err != nil {
+			println("Failed to read input")
+			client.status = Disconnected
+			break
+		}
+		println(msg)
+	}
 }
 
 func findFreeSlot(clientArray []*Client) (int, error) {

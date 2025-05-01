@@ -5,6 +5,7 @@ import "math/rand/v2"
 var NumEntities EntityId = 0
 
 const MAX_ENTITIES = 100
+const TILE_SIZE = 50
 
 var entities = make([]EntityId, MAX_ENTITIES)
 
@@ -75,7 +76,7 @@ func Tick() map[EntityId]*Position {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
 	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
-	MoveStuff(&CurrentLevel, PositionRegistry, VelocityRegistry, GravityRegistry)
+	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry)
 
 	return PositionRegistry
 }
