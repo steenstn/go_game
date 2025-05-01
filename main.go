@@ -222,16 +222,21 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	}
 
 	playerSpriteMessage, _ := json.Marshal(playerSprite)
-	jsonMessage, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(PlayerSprite), Msg: playerSpriteMessage})
-
-	_ = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, jsonMessage)
+	sendSetupMessage(clients[freeSlot], PlayerSprite, playerSpriteMessage)
 
 	tilesetMessage, _ := json.Marshal(levelTileset)
-	tileSetJson, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(LevelTileset), Msg: tilesetMessage})
-
-	_ = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, tileSetJson)
+	sendSetupMessage(clients[freeSlot], LevelTileset, tilesetMessage)
 
 	go inputLoop(clients[freeSlot], entityId)
+}
+
+func sendSetupMessage(client *Client, subtype SetupMessageSubType, message []byte) error {
+	jsonMessage, marshallError := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(subtype), Msg: message})
+	if marshallError != nil {
+		return marshallError
+	}
+
+	return client.connection.WriteMessage(websocket.TextMessage, jsonMessage)
 }
 
 /*
