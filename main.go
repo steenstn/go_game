@@ -64,6 +64,7 @@ func (m *ServerFullError) Error() string {
 
 type MessageType byte
 
+// #export "enums.js"
 const (
 	GameUpdateMessage     MessageType = 0
 	SetupMessage          MessageType = 1

@@ -77,13 +77,35 @@ func javascriptExport(filename string) {
 
 	fmt.Printf("Parsing %s\n", filename)
 
+	inputFileForRemoval, err2 := os.Open(filename)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+
+	defer inputFileForRemoval.Close()
+
+	regex := regexp.MustCompile("#export \"(.*)\"")
+
+	scannerForRemoval := bufio.NewScanner(inputFileForRemoval)
+
+	// Remove exported files so they can be recreated
+	for scannerForRemoval.Scan() {
+		if strings.Contains(scannerForRemoval.Text(), "#export") {
+			filePath := regex.FindStringSubmatch(scannerForRemoval.Text())[1] // enums.js
+			println("Removing " + "client/" + filePath)
+			err := os.Remove("client/" + filePath)
+			if err != nil {
+				println(err.Error())
+			}
+		}
+	}
+
 	inputFile, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer inputFile.Close()
 
-	regex := regexp.MustCompile("#export \"(.*)\"")
 	constRegex := regexp.MustCompile("const \\(")
 	enumRegex := regexp.MustCompile("(\\w+)\\s+(\\w+)\\s*=\\s*(\\d+)")
 
@@ -92,7 +114,8 @@ func javascriptExport(filename string) {
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "#export") {
 			filePath := regex.FindStringSubmatch(scanner.Text())[1] // enums.js
-			outputFile, err := os.Create("client/" + filePath)
+			outputFile, err := os.OpenFile("client/"+filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -115,7 +138,6 @@ func javascriptExport(filename string) {
 				fmt.Printf("%s_%s = %s;\n", matches[2], matches[1], matches[3])
 				outputFile.WriteString("const " + matches[2] + "_" + matches[1] + " = " + matches[3] + ";\n")
 			}
-			break
 
 		}
 	}

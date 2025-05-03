@@ -57,8 +57,8 @@ func InitGame() {
 	}
 
 	// TODO: Get this from level, don't hardcode
-	CurrentLevel.Width = 50
-	CurrentLevel.Height = 20
+	CurrentLevel.Width = 100
+	CurrentLevel.Height = 40
 
 	println("Loading level")
 	CurrentLevel.Data = LoadLevel("game/level.txt")

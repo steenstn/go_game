@@ -17,6 +17,7 @@
     // #include "client/enums.js"
     // #include "client/constants.js"
     // #include "client/queue.js"
+
     let input = document.getElementById("input");
     let output = document.getElementById("output");
     let socket;
@@ -40,6 +41,10 @@
     let viewportY = 0;
     let playerX = 0;
     let playerY = 0;
+
+    let animationCounter = 0;
+    let animationFlag = 0;
+    let direction = 0;
 
     let entities = [];
 
@@ -103,7 +108,7 @@
 
 
     let loadingLoop = () => {
-        console.log("LOading stuff")
+        console.log("Loading stuff")
     }
 
     let rain = () => {
@@ -126,14 +131,17 @@
 
         }
     }
+
     let gameLoop = () => {
         
 
         if(keysDown.has("ArrowLeft")) {
             playerX-=3;
+            direction = 1;
         }
         if(keysDown.has("ArrowRight")) {
             playerX+=3;
+            direction = 0;
         }
             ctx.fillStyle="#72727f";
             ctx.fillRect(0,0,c.width,c.height);
@@ -150,7 +158,7 @@
                 }
                 //ctx.fillRect(Math.floor(-viewportX + x), Math.floor(-viewportY + y), 50, 50);
                 x+=50;
-                if(x >= 50*50) {
+                if(x >= 100*50) {
                     x = 0;
                     y +=50;
                 }
@@ -160,15 +168,20 @@
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
-            ctx.drawImage(playerSpriteImage, 0,0, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
+            ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
             //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 10, 10);
         }
                 // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
                 viewportX = Math.max(1, playerX-c.width/2);
-                viewportX = Math.min(50*50-(c.width),viewportX);
+                viewportX = Math.min(50*100-(c.width),viewportX);
                 viewportY = Math.max(1, playerY-c.height/2);
                 viewportY = Math.min(50*20-(c.height),viewportY);
 
+        animationCounter++;
+        if (animationCounter > 5) {
+            animationCounter = 0;
+            animationFlag = 1 - animationFlag;
+        }
         //ctx.drawImage(playerSpriteImage, 10,10);
         setTimeout(gameLoop, 50);
 
