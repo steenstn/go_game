@@ -71,14 +71,6 @@ const (
 	PlayerPositionMessage MessageType = 2
 )
 
-type ClientStatus byte
-
-const (
-	Disconnected ClientStatus = 0
-	Connecting   ClientStatus = 1
-	Connected    ClientStatus = 2
-)
-
 type SetupMessageSubType byte
 
 // #export "enums.js"
@@ -88,10 +80,23 @@ const (
 	LevelTileset SetupMessageSubType = 2
 )
 
+type ClientStatus byte
+
+const (
+	Disconnected ClientStatus = 0
+	Connecting   ClientStatus = 1
+	Connected    ClientStatus = 2
+)
+
 type Client struct {
 	connection *websocket.Conn
 	status     ClientStatus
 	entityId   game.EntityId
+}
+
+type Input struct {
+	Num   int
+	Input byte
 }
 
 var clients = make([]*Client, 10)
@@ -156,11 +161,6 @@ func gameLoop() {
 
 		time.Sleep(50 * time.Millisecond)
 	}
-}
-
-type Input struct {
-	Num   int
-	Input byte
 }
 
 func inputLoop(client *Client, entityId game.EntityId) {

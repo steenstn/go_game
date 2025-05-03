@@ -61,7 +61,6 @@ class Queue {
     let output = document.getElementById("output");
     let socket;
     let keysDown = new Set();
-    let dt = 0;
     let lastFrame = new Date();
 
     let c = document.getElementById('c');
@@ -129,6 +128,7 @@ let setupKeyListeners = () => {
     let animationCounter = 0;
     let animationFlag = 0;
     let direction = 0;
+    let moving = 0;
 
     let entities = [];
 
@@ -161,14 +161,14 @@ let setupKeyListeners = () => {
             let message = JSON.parse(atob(json.Msg));
 
             switch(type) {
-                case GameUpdateMessage:
+                case MessageType_GameUpdateMessage:
                     // TODO Do not reallocate this every time
                     entities = [];
                     for(let i = 0; i < message.length; i++) {
                         entities.push({x: message[i].X, y: message[i].Y});
                     }
                     break;
-                case SetupMessage:
+                case MessageType_SetupMessage:
                     if(subType === SetupMessageSubType_Level) {
                         currentLevel = message;
                     } else if(subType === SetupMessageSubType_PlayerSprite) {
@@ -177,7 +177,7 @@ let setupKeyListeners = () => {
                         levelTilesetImage.src = 'data:image/png;base64,' + message;
                     }
                     break;
-                case PlayerPositionMessage:
+                case MessageType_PlayerPositionMessage:
                     playerX = message.X;
                     playerY = message.Y;
                     break;
@@ -218,16 +218,15 @@ let setupKeyListeners = () => {
 
     let gameLoop = () => {
         
-
         if(keysDown.has("ArrowLeft")) {
-            playerX-=3;
+            //playerX-=3;
             direction = 1;
         }
         if(keysDown.has("ArrowRight")) {
-            playerX+=3;
+            //playerX+=3;
             direction = 0;
         }
-            ctx.fillStyle="#72727f";
+            ctx.fillStyle="#7CC9ED";
             ctx.fillRect(0,0,c.width,c.height);
             let x = 0;
             let y = 0;
