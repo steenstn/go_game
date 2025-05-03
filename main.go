@@ -21,6 +21,7 @@ https://www.gabrielgambetta.com/client-server-game-architecture.html
 
 
 TODO:
+- Gör connection loop som ber om saker en i taget, använd enumet
 - CLient side prediction /reconciliation
 	- Try and reset the counter at some point.
 - Store entities locally?
@@ -79,6 +80,7 @@ const (
 
 type SetupMessageSubType byte
 
+// #export "enums.js"
 const (
 	Level        SetupMessageSubType = 0
 	PlayerSprite SetupMessageSubType = 1
@@ -98,7 +100,8 @@ var levelTileset, _ = os.ReadFile("tileset.png")
 
 func main() {
 
-	includeStuff("client/client.html")
+	javascriptExport("main.go")
+	javascriptParseInclude("client/client.html")
 
 	game.InitGame()
 	go gameLoop()
@@ -214,12 +217,7 @@ func join(responseWriter http.ResponseWriter, request *http.Request) {
 	clients[freeSlot] = &Client{connection: conn, status: Connected, entityId: entityId}
 
 	currentLevelMessage, _ := json.Marshal(game.CurrentLevel.Data)
-	gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(SetupMessage), SubType: byte(Level), Msg: currentLevelMessage})
-	err = clients[freeSlot].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
-	if err != nil {
-		println(err.Error())
-		return
-	}
+	sendSetupMessage(clients[freeSlot], Level, currentLevelMessage)
 
 	playerSpriteMessage, _ := json.Marshal(playerSprite)
 	sendSetupMessage(clients[freeSlot], PlayerSprite, playerSpriteMessage)
