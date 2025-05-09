@@ -34,19 +34,26 @@
 
     let head = {x: 100, y: 100};
 
-    let arms = [new Arm(40),
+    let arms = [
+        new Arm(40),
         new Arm(40),
         new Arm(40),
         new Arm(40)]
 
     // Two ways?
-    
+    arms[0].x = 200;
+    arms[0].y = 200;
     addEventListener("mousemove", (e) => {
-        head.x = e.clientX;
-        head.y = e.clientY;
+        target.x = e.clientX;
+        target.y = e.clientY;
     })
+
     
+    // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
     let target = {x: 500, y: 400};
+    let distance = (a, b) => {
+        return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
+    };
     let gameLoop = () => {
         ctx.fillStyle = "#fff";
         ctx.fillRect(0,0,c.width, c.height);
@@ -54,15 +61,57 @@
         ctx.fillRect(target.x,target.y,2,2);
 
 
+        let dist = Math.sqrt((target.x-arms[0].x)*(target.x-arms[0].x) + (target.y-arms[0].y)*(target.y-arms[0].y))
+
+        if(dist > arms.length*40) {
+            for(let i = 0; i < arms.length - 1; i++) {
+                let r = distance(target, arms[i]);
+                let delta = 40/r;
+                arms[i+1].x = (1-delta) * arms[i].x + delta*target.x;
+                arms[i+1].y = (1-delta) * arms[i].y + delta*target.y;
+            }
+        } else {
+            let bx = arms[0].x;
+            let by = arms[0].y;
+            let max = 1000;
+            let iterations = 0;
+            let diff = distance(arms[arms.length-1], target);
+            while (diff > 2 && iterations < max) {
+                iterations++;
+                arms[arms.length-1].x = target.x;
+                arms[arms.length-1].y = target.y;
+                for(let i = arms.length-2; i >=0; i--) {
+                    let r = distance(arms[i+1], arms[i]);
+                    let delta = 40/r;
+                    arms[i].x = (1-delta)*arms[i+1].x + delta*arms[i].x;
+                    arms[i].y = (1-delta)*arms[i+1].y + delta*arms[i].y;
+                }
+                arms[0].x = bx;
+                arms[0].y = by;
+                for(let i = 0; i < arms.length-1; i++) {
+                    let r = distance(arms[i+1], arms[i]);
+                    let delta = 40/r;
+                    arms[i+1].x = (1-delta)*arms[i].x + delta*arms[i+1].x;
+                    arms[i+1].y = (1-delta)*arms[i].y + delta*arms[i+1].y;
+                }
+                diff = distance(arms[arms.length-1], target);
+            }
+
+        }
+
+/*
         arms[0].angle = Math.atan2(target.y-arms[0].y, target.x-arms[0].x);
-        arms[0].x = head.x
-        arms[0].y = head.y
+        arms[0].x = arms[2].x
+        arms[0].y = arms[2].y
 
         arms[1].angle = Math.atan2(head.y-arms[1].y, head.x-arms[1].x);
         arms[1].x = head.x - arms[1].length*Math.cos(arms[1].angle)
         arms[1].y = head.y - arms[1].length*Math.sin(arms[1].angle)
 
-
+        arms[2].angle = Math.atan2(arms[1].y-arms[2].y, arms[1].x-arms[2].x);
+        arms[2].x = arms[1].x - arms[2].length*Math.cos(arms[2].angle)
+        arms[2].y = arms[1].y - arms[2].length*Math.sin(arms[2].angle)
+*/
         //arms[0].x = target.x-arms[0].length*Math.cos(arms[0].angle);
         //arms[0].y = target.y-arms[0].length*Math.sin(arms[0].angle);
         
@@ -86,19 +135,18 @@
  //       arms[3].x = target.x-arms[3].length*Math.cos(arms[3].angle);
 //        arms[3].y = target.y-arms[3].length*Math.sin(arms[3].angle);
 
-        for(let i=0; i < arms.length; i++) {
+        for(let i=0; i < arms.length-1; i++) {
             ctx.fillStyle = "#a00";
             ctx.fillRect(arms[i].x,arms[i].y,5,5);
             ctx.fillStyle= "#0a0";
-            ctx.fillRect(arms[i].endX()+5,arms[i].endY(),5,5);
             ctx.fillText(""+ i, arms[i].x, arms[i].y )
             ctx.beginPath();
             ctx.moveTo(arms[i].x, arms[i].y);
-            ctx.lineTo(arms[i].endX(), arms[i].endY());
+            ctx.lineTo(arms[i+1].x, arms[i+1].y);
             ctx.stroke();
         }
         ctx.fillRect(head.x, head.y,10,10);
-        requestAnimationFrame(gameLoop);
+        setTimeout(gameLoop, 20);
 
     }
 
