@@ -15,30 +15,15 @@
             this.x = 0;
             this.y = 0;
             this.length = length;
-            this.angle = 0;
         }
-
-        endX() {
-            return this.x + Math.cos(this.angle) * this.length;
-        }
-
-        endY() {
-            return this.y + Math.sin(this.angle) * this.length;
-        }
-
-        lookAt(x, y) {
-            this.angle = Math.atan2(y-this.y, x-this.x);
-        }
-
     }
 
-    let head = {x: 100, y: 100};
-
+    let armLength = 40;
     let arms = [
-        new Arm(40),
-        new Arm(40),
-        new Arm(40),
-        new Arm(40)]
+        new Arm(armLength),
+        new Arm(armLength),
+        new Arm(armLength),
+        new Arm(armLength)]
 
     // Two ways?
     arms[0].x = 200;
@@ -101,10 +86,10 @@ let releaseKey = (key) => {
 
         let dist = Math.sqrt((target.x-arms[0].x)*(target.x-arms[0].x) + (target.y-arms[0].y)*(target.y-arms[0].y))
 
-        if(dist > (arms.length)*40) {
+        if(dist > (arms.length)*armLength) {
             for(let i = 0; i < arms.length - 1; i++) {
                 let r = distance(target, arms[i]);
-                let delta = 40/r;
+                let delta = armLength/r;
                 arms[i+1].x = (1-delta) * arms[i].x + delta*target.x;
                 arms[i+1].y = (1-delta) * arms[i].y + delta*target.y;
             }
@@ -120,7 +105,7 @@ let releaseKey = (key) => {
                 arms[arms.length-1].y = target.y;
                 for(let i = arms.length-2; i >=0; i--) {
                     let r = distance(arms[i+1], arms[i]);
-                    let delta = 40/r;
+                    let delta = armLength/r;
                     arms[i].x = (1-delta)*arms[i+1].x + delta*arms[i].x;
                     arms[i].y = (1-delta)*arms[i+1].y + delta*arms[i].y;
                 }
@@ -129,7 +114,7 @@ let releaseKey = (key) => {
                 arms[0].y = by;
                 for(let i = 0; i < arms.length-1; i++) {
                     let r = distance(arms[i+1], arms[i]);
-                    let delta = 40/r;
+                    let delta = armLength/r;
                     arms[i+1].x = (1-delta)*arms[i].x + delta*arms[i+1].x;
                     arms[i+1].y = (1-delta)*arms[i].y + delta*arms[i+1].y;
                 }
@@ -137,42 +122,6 @@ let releaseKey = (key) => {
             }
 
         }
-
-/*
-        arms[0].angle = Math.atan2(target.y-arms[0].y, target.x-arms[0].x);
-        arms[0].x = arms[2].x
-        arms[0].y = arms[2].y
-
-        arms[1].angle = Math.atan2(head.y-arms[1].y, head.x-arms[1].x);
-        arms[1].x = head.x - arms[1].length*Math.cos(arms[1].angle)
-        arms[1].y = head.y - arms[1].length*Math.sin(arms[1].angle)
-
-        arms[2].angle = Math.atan2(arms[1].y-arms[2].y, arms[1].x-arms[2].x);
-        arms[2].x = arms[1].x - arms[2].length*Math.cos(arms[2].angle)
-        arms[2].y = arms[1].y - arms[2].length*Math.sin(arms[2].angle)
-*/
-        //arms[0].x = target.x-arms[0].length*Math.cos(arms[0].angle);
-        //arms[0].y = target.y-arms[0].length*Math.sin(arms[0].angle);
-        
-/*
-        arms[0].angle = Math.atan2(head.y-arms[0].y, head.x-arms[0].x);
-        arms[0].x = head.x-arms[0].length*Math.cos(arms[0].angle);
-        arms[0].y = head.y-arms[0].length*Math.sin(arms[0].angle);
-
-        
-        for(let i = 1; i < arms.length-1; i++) {
-            arms[i].angle = Math.atan2(arms[i-1].y-arms[i].y, arms[i-1].x-arms[i].x);
-            arms[i].x = arms[i-1].x-arms[i].length*Math.cos(arms[i].angle);
-            arms[i].y = arms[i-1].y-arms[i].length*Math.sin(arms[i].angle);
-        }
-
-
-        arms[3].angle = Math.atan2(target.y-arms[3].y, target.x-arms[3].x);
-        arms[3].x = arms[2].x;
-        arms[3].y = arms[2].y;
-        */
- //       arms[3].x = target.x-arms[3].length*Math.cos(arms[3].angle);
-//        arms[3].y = target.y-arms[3].length*Math.sin(arms[3].angle);
 
         for(let i=0; i < arms.length-1; i++) {
             ctx.fillStyle = "#a00";
@@ -184,7 +133,6 @@ let releaseKey = (key) => {
             ctx.lineTo(arms[i+1].x, arms[i+1].y);
             ctx.stroke();
         }
-        //ctx.fillRect(head.x, head.y,10,10);
         setTimeout(gameLoop, 20);
 
     }
