@@ -1,0 +1,33 @@
+<html>
+    <head>
+    </head>
+    <body>
+<canvas id="c"></canvas>
+<script>
+    let c = document.getElementById('c');
+    c.width = window.innerWidth-50;
+    c.height = window.innerHeight-50;
+    let ctx = c.getContext('2d');
+
+    
+
+    let p0 = {x: 10, y:10};
+    let p1 = {x: 50, y:100};
+    let p2 = {x: 200, y:10};
+
+    //let gameLoop = () => {
+
+    for(let t = 0; t <= 1; t+=0.01) {
+        let bx = (1-t)*((1-t)*p0.x + t*p1.x) + t*((1-t)*p1.x + t*p2.x);
+        let by = (1-t)*((1-t)*p0.y + t*p1.y) + t*((1-t)*p1.y + t*p2.y);
+        ctx.fillRect(bx,by,1,1);
+        t+=0.01;
+    }
+
+
+
+    //gameLoop();
+    </script>
+    </body>
+</html>
+

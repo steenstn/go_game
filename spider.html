@@ -11,37 +11,45 @@
 
     
     class Arm {
+        constructor() {
+            this.segments = [
+                new ArmSegment(40),
+                new ArmSegment(40),
+                new ArmSegment(40),
+                new ArmSegment(40)
+            ]
+        }
+    };
+
+    class ArmSegment {
         constructor(length) {
             this.x = 0;
             this.y = 0;
             this.length = length;
         }
-    }
+    };
 
     let armLength = 40;
-    let arms = [
-        new Arm(armLength),
-        new Arm(armLength),
-        new Arm(armLength),
-        new Arm(armLength)]
+    let arm = new Arm();
+    let arms = arm.segments;
 
-    // Two ways?
+    let bodyTarget = {x: 400, y: 300};
     arms[0].x = 200;
-    arms[0].y = 200;
+    arms[0].y = 300;
     addEventListener("mousemove", (e) => {
-        target.x = e.clientX;
-        target.y = e.clientY;
+        //target.x = e.clientX;
+        //target.y = e.clientY;
     })
 
 
     let keysDown = new Set();
-let pressKey = (key) => {
-    keysDown.add(key);
-}
+    let pressKey = (key) => {
+        keysDown.add(key);
+    }
 
-let releaseKey = (key) => {
-    keysDown.delete(key);
-};
+    let releaseKey = (key) => {
+        keysDown.delete(key);
+    };
 
     addEventListener("keydown", (e) => {
         pressKey(e.key);
@@ -53,36 +61,69 @@ let releaseKey = (key) => {
     
 
     // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
-    let target = {x: 500, y: 400};
+    let target = {x: 200, y: 400};
+    let target2 = {x: 250, y: 400};
+    let rise = 40;
+    let reach = 100;
+    let p0 = {x: target2.x, y:target2.y};
+    let p1 = {x: target2.x, y:target2.y};
+    let p2 = {x: target2.x, y:target2.y};
+
     let distance = (a, b) => {
         return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
     };
+
+    let t = 0;
     let gameLoop = () => {
         if(keysDown.has("ArrowLeft")) {
             for(let i = 0; i < arms.length; i++) {
-                arms[i].x--;
+                arms[i].x-=2;
+            }
+            if(Math.abs(arms[0].x - p2.x) > 50) {
+                target2.x = arms[0].x -80;
+                p0 = {x: target.x, y: target.y};
+                p1 = {x: p0.x-reach/2, y: p0.y-rise};
+                p2 = {x: p0.x-reach, y: target2.y};
+                t=0;
             }
         }
         if(keysDown.has("ArrowRight")) {
             for(let i = 0; i < arms.length; i++) {
-                arms[i].x++;
+                arms[i].x+=2;
+            }
+            if(Math.abs(arms[0].x - p2.x) > 50) {
+                target2.x = arms[0].x - 80;
+                p0 = {x: target.x, y: target.y};
+                p1 = {x: p0.x+reach/2, y: p0.y-rise};
+                p2 = {x: p0.x+reach, y: target2.y};
+                t=0;
             }
         }
         if(keysDown.has("ArrowUp")) {
             for(let i = 0; i < arms.length; i++) {
-                arms[i].y--;
+                arms[i].y-=2;
             }
         }
         if(keysDown.has("ArrowDown")) {
             for(let i = 0; i < arms.length; i++) {
-                arms[i].y++;
+                arms[i].y+=2;
             }
         }
+
         ctx.fillStyle = "#fff";
         ctx.fillRect(0,0,c.width, c.height);
         ctx.fillStyle = "#000";
-        ctx.fillRect(target.x,target.y,2,2);
+      //  ctx.fillRect(target.x,target.y,2,2);
 
+
+        let bx = (1-t)*((1-t)*p0.x + t*p1.x) + t*((1-t)*p1.x + t*p2.x);
+        let by = (1-t)*((1-t)*p0.y + t*p1.y) + t*((1-t)*p1.y + t*p2.y);
+
+        target.x = bx;
+        target.y = by;
+        if(t <1) {
+            t+=0.1;
+        }
 
         let dist = Math.sqrt((target.x-arms[0].x)*(target.x-arms[0].x) + (target.y-arms[0].y)*(target.y-arms[0].y))
 
@@ -126,12 +167,23 @@ let releaseKey = (key) => {
         for(let i=0; i < arms.length-1; i++) {
             ctx.fillStyle = "#a00";
             ctx.fillRect(arms[i].x,arms[i].y,5,5);
-            ctx.fillStyle= "#0a0";
+            ctx.fillStyle= "#000";
             ctx.fillText(""+ i, arms[i].x, arms[i].y )
             ctx.beginPath();
             ctx.moveTo(arms[i].x, arms[i].y);
             ctx.lineTo(arms[i+1].x, arms[i+1].y);
             ctx.stroke();
+        }
+
+        if(false) {
+
+            ctx.fillStyle= "#0f0";
+            ctx.fillRect(target.x, target.y, 10,10);
+            ctx.fillStyle= "#060";
+            ctx.fillRect(target2.x, target2.y, 10,10);
+            ctx.fillStyle= "#06f";
+            ctx.fillText("target2", target2.x, target2.y);
+            ctx.fillRect(bodyTarget.x, bodyTarget.y, 10,10);
         }
         setTimeout(gameLoop, 20);
 
