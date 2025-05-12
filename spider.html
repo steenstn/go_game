@@ -20,8 +20,11 @@
             ]
             this.target = {x: 200, y: 400};
             this.target2 = {x: 250, y: 400};
-            this.rise = 40;
+            this.rise = 70;
             this.reach = 100;
+            this.p0 = {x: this.target2.x, y:this.target2.y};
+            this.p1 = {x: this.target2.x, y:this.target2.y};
+            this.p2 = {x: this.target2.x, y:this.target2.y};
         }
     };
 
@@ -65,9 +68,6 @@
     
 
     // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
-    let p0 = {x: arm.target2.x, y:arm.target2.y};
-    let p1 = {x: arm.target2.x, y:arm.target2.y};
-    let p2 = {x: arm.target2.x, y:arm.target2.y};
 
     let distance = (a, b) => {
         return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
@@ -79,11 +79,11 @@
             for(let i = 0; i < arms.length; i++) {
                 arms[i].x-=2;
             }
-            if(Math.abs(arms[0].x - p2.x) > 50) {
+            if(Math.abs(arms[0].x - arm.p2.x) > 50) {
                 arm.target2.x = arms[0].x -80;
-                p0 = {x: arm.target.x, y: arm.target.y};
-                p1 = {x: p0.x-arm.reach/2, y: p0.y-arm.rise};
-                p2 = {x: p0.x-arm.reach, y: arm.target2.y};
+                arm.p0 = {x: arm.target.x, y: arm.target.y};
+                arm.p1 = {x: arm.p0.x-arm.reach/2, y: arm.p0.y-arm.rise};
+                arm.p2 = {x: arm.p0.x-arm.reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -91,11 +91,11 @@
             for(let i = 0; i < arms.length; i++) {
                 arms[i].x+=2;
             }
-            if(Math.abs(arms[0].x - p2.x) > 50) {
+            if(Math.abs(arms[0].x - arm.p2.x) > 50) {
                 arm.target2.x = arms[0].x - 80;
-                p0 = {x: arm.target.x, y: arm.target.y};
-                p1 = {x: p0.x+arm.reach/2, y: p0.y-arm.rise};
-                p2 = {x: p0.x+arm.reach, y: arm.target2.y};
+                arm.p0 = {x: arm.target.x, y: arm.target.y};
+                arm.p1 = {x: arm.p0.x+arm.reach/2, y: arm.p0.y-arm.rise};
+                arm.p2 = {x: arm.p0.x+arm.reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -116,8 +116,8 @@
       //  ctx.fillRect(target.x,target.y,2,2);
 
 
-        let bx = (1-t)*((1-t)*p0.x + t*p1.x) + t*((1-t)*p1.x + t*p2.x);
-        let by = (1-t)*((1-t)*p0.y + t*p1.y) + t*((1-t)*p1.y + t*p2.y);
+        let bx = (1-t)*((1-t)*arm.p0.x + t*arm.p1.x) + t*((1-t)*arm.p1.x + t*arm.p2.x);
+        let by = (1-t)*((1-t)*arm.p0.y + t*arm.p1.y) + t*((1-t)*arm.p1.y + t*arm.p2.y);
 
         arm.target.x = bx;
         arm.target.y = by;
