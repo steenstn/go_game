@@ -18,6 +18,8 @@
                 new ArmSegment(40),
                 new ArmSegment(40)
             ]
+            this.target = {x: 200, y: 400};
+            this.target2 = {x: 250, y: 400};
         }
     };
 
@@ -61,13 +63,11 @@
     
 
     // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
-    let target = {x: 200, y: 400};
-    let target2 = {x: 250, y: 400};
     let rise = 40;
     let reach = 100;
-    let p0 = {x: target2.x, y:target2.y};
-    let p1 = {x: target2.x, y:target2.y};
-    let p2 = {x: target2.x, y:target2.y};
+    let p0 = {x: arm.target2.x, y:arm.target2.y};
+    let p1 = {x: arm.target2.x, y:arm.target2.y};
+    let p2 = {x: arm.target2.x, y:arm.target2.y};
 
     let distance = (a, b) => {
         return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
@@ -80,10 +80,10 @@
                 arms[i].x-=2;
             }
             if(Math.abs(arms[0].x - p2.x) > 50) {
-                target2.x = arms[0].x -80;
-                p0 = {x: target.x, y: target.y};
+                arm.target2.x = arms[0].x -80;
+                p0 = {x: arm.target.x, y: arm.target.y};
                 p1 = {x: p0.x-reach/2, y: p0.y-rise};
-                p2 = {x: p0.x-reach, y: target2.y};
+                p2 = {x: p0.x-reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -92,10 +92,10 @@
                 arms[i].x+=2;
             }
             if(Math.abs(arms[0].x - p2.x) > 50) {
-                target2.x = arms[0].x - 80;
-                p0 = {x: target.x, y: target.y};
+                arm.target2.x = arms[0].x - 80;
+                p0 = {x: arm.target.x, y: arm.target.y};
                 p1 = {x: p0.x+reach/2, y: p0.y-rise};
-                p2 = {x: p0.x+reach, y: target2.y};
+                p2 = {x: p0.x+reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -119,31 +119,31 @@
         let bx = (1-t)*((1-t)*p0.x + t*p1.x) + t*((1-t)*p1.x + t*p2.x);
         let by = (1-t)*((1-t)*p0.y + t*p1.y) + t*((1-t)*p1.y + t*p2.y);
 
-        target.x = bx;
-        target.y = by;
+        arm.target.x = bx;
+        arm.target.y = by;
         if(t <1) {
             t+=0.1;
         }
 
-        let dist = Math.sqrt((target.x-arms[0].x)*(target.x-arms[0].x) + (target.y-arms[0].y)*(target.y-arms[0].y))
+        let dist = Math.sqrt((arm.target.x-arms[0].x)*(arm.target.x-arms[0].x) + (arm.target.y-arms[0].y)*(arm.target.y-arms[0].y))
 
         if(dist > (arms.length)*armLength) {
             for(let i = 0; i < arms.length - 1; i++) {
-                let r = distance(target, arms[i]);
+                let r = distance(arm.target, arms[i]);
                 let delta = armLength/r;
-                arms[i+1].x = (1-delta) * arms[i].x + delta*target.x;
-                arms[i+1].y = (1-delta) * arms[i].y + delta*target.y;
+                arms[i+1].x = (1-delta) * arms[i].x + delta*arm.target.x;
+                arms[i+1].y = (1-delta) * arms[i].y + delta*arm.target.y;
             }
         } else {
             let bx = arms[0].x;
             let by = arms[0].y;
             let max = 1000;
             let iterations = 0;
-            let diff = distance(arms[arms.length-1], target);
+            let diff = distance(arms[arms.length-1], arm.target);
             while (diff > 2 && iterations < max) {
                 iterations++;
-                arms[arms.length-1].x = target.x;
-                arms[arms.length-1].y = target.y;
+                arms[arms.length-1].x = arm.target.x;
+                arms[arms.length-1].y = arm.target.y;
                 for(let i = arms.length-2; i >=0; i--) {
                     let r = distance(arms[i+1], arms[i]);
                     let delta = armLength/r;
@@ -159,7 +159,7 @@
                     arms[i+1].x = (1-delta)*arms[i].x + delta*arms[i+1].x;
                     arms[i+1].y = (1-delta)*arms[i].y + delta*arms[i+1].y;
                 }
-                diff = distance(arms[arms.length-1], target);
+                diff = distance(arms[arms.length-1], arm.target);
             }
 
         }
@@ -178,11 +178,11 @@
         if(false) {
 
             ctx.fillStyle= "#0f0";
-            ctx.fillRect(target.x, target.y, 10,10);
+            ctx.fillRect(arm.target.x, arm.target.y, 10,10);
             ctx.fillStyle= "#060";
-            ctx.fillRect(target2.x, target2.y, 10,10);
+            ctx.fillRect(arm.target2.x, arm.target2.y, 10,10);
             ctx.fillStyle= "#06f";
-            ctx.fillText("target2", target2.x, target2.y);
+            ctx.fillText("arm.target2", arm.target2.x, arm.target2.y);
             ctx.fillRect(bodyTarget.x, bodyTarget.y, 10,10);
         }
         setTimeout(gameLoop, 20);
