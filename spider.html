@@ -20,6 +20,8 @@
             ]
             this.target = {x: 200, y: 400};
             this.target2 = {x: 250, y: 400};
+            this.rise = 40;
+            this.reach = 100;
         }
     };
 
@@ -63,8 +65,6 @@
     
 
     // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
-    let rise = 40;
-    let reach = 100;
     let p0 = {x: arm.target2.x, y:arm.target2.y};
     let p1 = {x: arm.target2.x, y:arm.target2.y};
     let p2 = {x: arm.target2.x, y:arm.target2.y};
@@ -82,8 +82,8 @@
             if(Math.abs(arms[0].x - p2.x) > 50) {
                 arm.target2.x = arms[0].x -80;
                 p0 = {x: arm.target.x, y: arm.target.y};
-                p1 = {x: p0.x-reach/2, y: p0.y-rise};
-                p2 = {x: p0.x-reach, y: arm.target2.y};
+                p1 = {x: p0.x-arm.reach/2, y: p0.y-arm.rise};
+                p2 = {x: p0.x-arm.reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -94,8 +94,8 @@
             if(Math.abs(arms[0].x - p2.x) > 50) {
                 arm.target2.x = arms[0].x - 80;
                 p0 = {x: arm.target.x, y: arm.target.y};
-                p1 = {x: p0.x+reach/2, y: p0.y-rise};
-                p2 = {x: p0.x+reach, y: arm.target2.y};
+                p1 = {x: p0.x+arm.reach/2, y: p0.y-arm.rise};
+                p2 = {x: p0.x+arm.reach, y: arm.target2.y};
                 t=0;
             }
         }
@@ -175,7 +175,7 @@
             ctx.stroke();
         }
 
-        if(false) {
+        if(true) {
 
             ctx.fillStyle= "#0f0";
             ctx.fillRect(arm.target.x, arm.target.y, 10,10);
