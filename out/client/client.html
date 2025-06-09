@@ -20,10 +20,6 @@ const MessageType_PlayerPositionMessage = 2;
 const SetupMessageSubType_Level = 0;
 const SetupMessageSubType_PlayerSprite = 1;
 const SetupMessageSubType_LevelTileset = 2;
-// The types of messages that the server can send
-const GameUpdateMessage = 0;
-const SetupMessage = 1;
-const PlayerPositionMessage = 2;
 // Circular array queue
 class Queue {
     
@@ -219,12 +215,12 @@ let setupKeyListeners = () => {
     let gameLoop = () => {
         
         if(keysDown.has("ArrowLeft")) {
-            playerX-=3;
-            direction = 1;
+            //playerX-=3;
+            //direction = 1;
         }
         if(keysDown.has("ArrowRight")) {
-            playerX+=3;
-            direction = 0;
+            //playerX+=3;
+            //direction = 0;
         }
             ctx.fillStyle="#7CC9ED";
             ctx.fillRect(0,0,c.width,c.height);

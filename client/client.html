@@ -15,7 +15,6 @@
 <script>
     "use strict";
     // #include "client/enums.js"
-    // #include "client/constants.js"
     // #include "client/queue.js"
 
     let input = document.getElementById("input");
@@ -135,12 +134,12 @@
     let gameLoop = () => {
         
         if(keysDown.has("ArrowLeft")) {
-            playerX-=3;
-            direction = 1;
+            //playerX-=3;
+            //direction = 1;
         }
         if(keysDown.has("ArrowRight")) {
-            playerX+=3;
-            direction = 0;
+            //playerX+=3;
+            //direction = 0;
         }
             ctx.fillStyle="#7CC9ED";
             ctx.fillRect(0,0,c.width,c.height);

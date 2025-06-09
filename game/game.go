@@ -17,6 +17,13 @@ type Level struct {
 	Data   []int
 }
 
+type PlayerKeyPress struct {
+	Up    bool
+	Down  bool
+	Left  bool
+	Right bool
+}
+
 var PlayerEntities = make([]EntityId, 0)
 
 var CurrentLevel Level
@@ -32,13 +39,6 @@ func AddPlayer() EntityId {
 	playerEntityId := NumEntities - 1
 	PlayerEntities = append(PlayerEntities, playerEntityId)
 	return NumEntities - 1
-}
-
-type PlayerKeyPress struct {
-	Up    bool
-	Down  bool
-	Left  bool
-	Right bool
 }
 
 func createThing(x float64, y float64) {

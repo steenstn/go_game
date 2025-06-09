@@ -10,8 +10,6 @@
     let ctx = c.getContext('2d');
 
     
-    let speed = 0;
-    let acc = 1;
     class Arm {
         constructor(startX, startY) {
             this.segments = [
@@ -40,6 +38,7 @@
     };
 
     let armLength = 40;
+    //let spider = [new Arm(200, 400) ];
     let spider = [new Arm(200, 400), new Arm(250, 400), new Arm(300, 400)];
 
     let bodyTarget = {x: 400, y: 300};
@@ -52,6 +51,7 @@
 
     spider[2].segments[0].x = 200;
     spider[2].segments[0].y = 300;
+    
 
     addEventListener("mousemove", (e) => {
         //target.x = e.clientX;
@@ -132,6 +132,7 @@
           //  ctx.fillRect(target.x,target.y,2,2);
 
 
+            // Bezier curve
             let bx = (1-arm.t)*((1-arm.t)*arm.p0.x + arm.t*arm.p1.x) + arm.t*((1-arm.t)*arm.p1.x + arm.t*arm.p2.x);
             let by = (1-arm.t)*((1-arm.t)*arm.p0.y + arm.t*arm.p1.y) + arm.t*((1-arm.t)*arm.p1.y + arm.t*arm.p2.y);
 
@@ -153,7 +154,7 @@
             } else {
                 let bx = arms[0].x;
                 let by = arms[0].y;
-                let max = 1000;
+                let max = 500;
                 let iterations = 0;
                 let diff = distance(arms[arms.length-1], arm.target);
                 while (diff > 2 && iterations < max) {
@@ -180,6 +181,15 @@
 
             }
 
+            // Rotation check
+
+            for(let i=0; i < arms.length-2; i++) {
+                let angle = Math.atan2(arms[i+1].y-arms[i].y, arms[i+1].x-arms[i].x);
+                let angle2 = Math.atan2(arms[i+2].y-arms[i].y, arms[i+2].x-arms[i].x);
+                ctx.fillText(""+ (angle*(180/Math.PI)), arms[i].x+20, arms[i].y )
+                ctx.fillText(""+ (angle2*(180/Math.PI)), arms[i].x+20, arms[i].y+20 )
+            }
+
             for(let i=0; i < arms.length-1; i++) {
                 ctx.fillStyle = "#a00";
                 ctx.fillRect(arms[i].x,arms[i].y,5,5);
@@ -191,7 +201,7 @@
                 ctx.stroke();
             }
 
-            if(false) {
+            if(true) {
 
                 ctx.fillStyle= "#0f0";
                 ctx.fillRect(arm.target.x, arm.target.y, 10,10);
