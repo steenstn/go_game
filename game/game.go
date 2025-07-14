@@ -24,6 +24,9 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
+type EntityType {
+
+}
 var PlayerEntities = make([]EntityId, 0)
 
 var CurrentLevel Level
@@ -50,11 +53,22 @@ func createThing(x float64, y float64) {
 	NumEntities++
 }
 
+func createSpider(x float64, y float64) {
+	PositionRegistry[NumEntities] = &Position{X: x, Y: y}
+	VelocityRegistry[NumEntities] = &Velocity{Vx: 3, Vy: 0}
+	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
+	CircleMovementRegistry[NumEntities] = &CircleMovement{Timer: 20, Direction: 1}
+
+	NumEntities++
+}
+
 func InitGame() {
 	println("Init game")
 	for range 10 {
 		createThing(30*50, 100)
 	}
+
+	createSpider(35*50, 300)
 
 	// TODO: Get this from level, don't hardcode
 	CurrentLevel.Width = 100
@@ -76,7 +90,9 @@ func Tick() map[EntityId]*Position {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
 	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
+	HandleCircleMovement(CircleMovementRegistry, VelocityRegistry)
 	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry)
 
 	return PositionRegistry
 }
+

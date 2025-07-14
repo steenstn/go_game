@@ -149,15 +149,16 @@ let setupKeyListeners = () => {
             //console.log(atob(JSON.parse(e.data).Msg))
 
             let json = JSON.parse(e.data);
-//            console.log("Type", json.Type)
+            console.log("Type", json.Type)
             let type = JSON.parse(json.Type);
             let subType = JSON.parse(json.SubType);
             console.log("subtype", subType);
- //           console.log("type", type)
+            console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
 
             switch(type) {
                 case MessageType_GameUpdateMessage:
+		    console.log(message);
                     // TODO Do not reallocate this every time
                     entities = [];
                     for(let i = 0; i < message.length; i++) {

@@ -179,8 +179,8 @@ func inputLoop(client *Client, entityId game.EntityId) {
 		}
 
 		//fmt.Printf("input: %b\n", msg)
-		// TODO: Validate better
-		/*if len(msg) > 5 {
+		// TODO: Validate
+		/*if len(msg) > 1 {
 			println("Input message is too long, dropping")
 			println(string(msg))
 			println("--")

@@ -34,6 +34,25 @@ func distanceSquared(p1 Position, p2 Position) float64 {
 	return (p2.X-p1.X)*(p2.X-p1.X) + (p2.Y-p1.Y)*(p2.Y-p1.Y)
 }
 
+func HandleCircleMovement(circleMovement map[EntityId]*CircleMovement, velocityRegistry map[EntityId]*Velocity) {
+	for e := EntityId(0); e < NumEntities; e++ {
+		thing, thingOk := CircleMovementRegistry[e]
+		if thingOk {
+
+			thing.Timer--
+
+			if thing.Timer <= 0 {
+				thing.Direction = thing.Direction * -1
+				thing.Timer = rand.IntN(50) + 5
+				velocity, _ := velocityRegistry[e]
+				velocity.Vx = float64(2 * thing.Direction)
+			}
+
+		}
+	}
+
+}
+
 func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId]*Velocity, players []EntityId, positionRegistry map[EntityId]*Position) {
 	for e := EntityId(0); e < NumEntities; e++ {
 		ai, aiOk := aiRegistry[e]
