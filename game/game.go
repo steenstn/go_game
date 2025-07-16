@@ -24,9 +24,6 @@ type PlayerKeyPress struct {
 	Right bool
 }
 
-type EntityType {
-
-}
 var PlayerEntities = make([]EntityId, 0)
 
 var CurrentLevel Level
@@ -36,6 +33,7 @@ func AddPlayer() EntityId {
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
 	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
+	EntityTypeRegistry[NumEntities] = 0
 
 	NumEntities++
 
@@ -49,6 +47,7 @@ func createThing(x float64, y float64) {
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	AIRegistry[NumEntities] = &AIMovement{Timer: rand.IntN(100)}
 	GravityRegistry[NumEntities] = &Force{X: 0, Y: 0}
+	EntityTypeRegistry[NumEntities] = 1
 
 	NumEntities++
 }
@@ -58,6 +57,7 @@ func createSpider(x float64, y float64) {
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 3, Vy: 0}
 	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
 	CircleMovementRegistry[NumEntities] = &CircleMovement{Timer: 20, Direction: 1}
+	EntityTypeRegistry[NumEntities] = 2
 
 	NumEntities++
 }
@@ -86,13 +86,11 @@ func HandleInput(input byte, entityId EntityId) {
 	player.Right = input&8 > 0
 }
 
-func Tick() map[EntityId]*Position {
+func Tick() {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
 	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
 	HandleCircleMovement(CircleMovementRegistry, VelocityRegistry)
 	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry)
 
-	return PositionRegistry
 }
-

@@ -14,6 +14,9 @@
 <pre id="output"></pre>
 <script>
     "use strict";
+const EntityType_Player = 0;
+const EntityType_Fly = 1;
+const EntityType_Spider = 2;
 const MessageType_GameUpdateMessage = 0;
 const MessageType_SetupMessage = 1;
 const MessageType_PlayerPositionMessage = 2;
@@ -149,20 +152,18 @@ let setupKeyListeners = () => {
             //console.log(atob(JSON.parse(e.data).Msg))
 
             let json = JSON.parse(e.data);
-            console.log("Type", json.Type)
             let type = JSON.parse(json.Type);
             let subType = JSON.parse(json.SubType);
             console.log("subtype", subType);
-            console.log("type", type)
             let message = JSON.parse(atob(json.Msg));
 
             switch(type) {
                 case MessageType_GameUpdateMessage:
-		    console.log(message);
                     // TODO Do not reallocate this every time
                     entities = [];
-                    for(let i = 0; i < message.length; i++) {
-                        entities.push({x: message[i].X, y: message[i].Y});
+            console.log(message)
+                    for(let i = 0; i < message.Positions.length; i++) {
+                        entities.push({x: message.Positions[i].X, y: message.Positions[i].Y, type: message.Types[i]});
                     }
                     break;
                 case MessageType_SetupMessage:
@@ -248,14 +249,25 @@ let setupKeyListeners = () => {
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
+        if(entities[i].type === 0) {
             ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
-            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 10, 10);
+        } else if (entities[i].type === 1) {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
+            ctx.fillStyle = "#ddd";
+            ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+            ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+
+        } else if (entities[i].type === 2) {
+            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+        }
+
         }
                 // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
-                viewportX = Math.max(1, playerX-c.width/2);
-                viewportX = Math.min(50*100-(c.width),viewportX);
-                viewportY = Math.max(1, playerY-c.height/2);
-                viewportY = Math.min(50*20-(c.height),viewportY);
+            viewportX = Math.max(1, playerX-c.width/2);
+            viewportX = Math.min(50*100-(c.width),viewportX);
+            viewportY = Math.max(1, playerY-c.height/2);
+            viewportY = Math.min(50*20-(c.height),viewportY);
 
         animationCounter++;
         if (animationCounter > 5) {

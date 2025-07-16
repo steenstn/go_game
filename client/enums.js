@@ -1,3 +1,6 @@
+const EntityType_Player = 0;
+const EntityType_Fly = 1;
+const EntityType_Spider = 2;
 const MessageType_GameUpdateMessage = 0;
 const MessageType_SetupMessage = 1;
 const MessageType_PlayerPositionMessage = 2;

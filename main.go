@@ -62,6 +62,15 @@ func (m *ServerFullError) Error() string {
 	return "Server is full"
 }
 
+type EntityType byte
+
+// #export "enums.js"
+const (
+	Player EntityType = 0
+	Fly    EntityType = 1
+	Spider EntityType = 2
+)
+
 type MessageType byte
 
 // #export "enums.js"
@@ -125,14 +134,21 @@ func main() {
 
 }
 
+type lolDaMessage struct {
+	Positions []game.Position
+	Types     []int
+}
+
 func gameLoop() {
 	for {
-		game_update := game.Tick()
+		game.Tick()
+		game_update := game.PositionRegistry
 
 		position_array := make([]game.Position, 0, len(game_update))
-
-		for _, value := range game_update {
-			position_array = append(position_array, *value)
+		types_array := make([]int, 0, len(game_update))
+		for i := game.EntityId(0); i < game.NumEntities; i++ {
+			position_array = append(position_array, *game.PositionRegistry[i])
+			types_array = append(types_array, game.EntityTypeRegistry[i])
 		}
 
 		for i := range clients {
@@ -147,7 +163,8 @@ func gameLoop() {
 			clients[i].connection.WriteMessage(websocket.TextMessage, playerPositionMessage)
 
 			// Send all positions
-			positions, _ := json.Marshal(position_array)
+			daMessage := lolDaMessage{Positions: position_array, Types: types_array}
+			positions, _ := json.Marshal(daMessage)
 			gameUpdateMessage, _ := json.Marshal(JsonMessage{Type: byte(GameUpdateMessage), Msg: positions})
 			err := clients[i].connection.WriteMessage(websocket.TextMessage, gameUpdateMessage)
 

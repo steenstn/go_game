@@ -8,6 +8,15 @@ var PlayerInputRegistry = make(map[EntityId]*PlayerKeyPress)
 var GravityRegistry = make(map[EntityId]*Force)
 var AIRegistry = make(map[EntityId]*AIMovement)
 var CircleMovementRegistry = make(map[EntityId]*CircleMovement)
+var EntityTypeRegistry = make(map[EntityId]int)
+
+type EntityType byte
+
+const (
+	Player EntityType = 0
+	Fly    EntityType = 1
+	Spider EntityType = 2
+)
 
 type Position struct {
 	X float64
