@@ -1,3 +1,14 @@
+// https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
+
+class Spider {
+  constructor(startX, startY) {
+    this.arms = [new Arm(startX, startY),
+      new Arm(startX+50, startY),
+      new Arm(startX+100, startY),
+    ]
+  }
+}
+
 class Arm {
     constructor(startX, startY) {
         this.segments = [
@@ -37,6 +48,9 @@ let moveDown = (arms) => {
   }
 }
 
+let distance = (a, b) => {
+    return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
+};
 /*
  Interpolate between p0, p1, p2 with with t = 0-1
  */

@@ -10,12 +10,12 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
-    
-
 
     let armLength = 40;
-    //let spider = [new Arm(200, 400) ];
-    let spider = [new Arm(200, 400), new Arm(250, 400), new Arm(300, 400)];
+
+    // This should be spider variable.
+    let daSpider = new Spider(200, 400);
+    let spider = daSpider.arms;
 
     let bodyTarget = {x: 400, y: 300};
 
@@ -52,12 +52,6 @@
         releaseKey(e.key);
     }, false)
     
-
-    // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
-
-    let distance = (a, b) => {
-        return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
-    };
 
     let gameLoop = () => {
 
