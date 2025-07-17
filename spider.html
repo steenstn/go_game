@@ -3,6 +3,7 @@
     </head>
     <body>
 <canvas id="c"></canvas>
+<script src="spider.js"></script>
 <script>
     let c = document.getElementById('c');
     c.width = window.innerWidth-50;
@@ -10,32 +11,7 @@
     let ctx = c.getContext('2d');
 
     
-    class Arm {
-        constructor(startX, startY) {
-            this.segments = [
-                new ArmSegment(50),
-                new ArmSegment(50),
-                new ArmSegment(50),
-                new ArmSegment(50)
-            ]
-            this.t=0;
-            this.target = {x: startX, y: startY};
-            this.target2 = {x: this.target.x, y: this.target.y};
-            this.rise = 60;
-            this.reach = 120;
-            this.p0 = {x: this.target2.x, y:this.target2.y};
-            this.p1 = {x: this.target2.x, y:this.target2.y};
-            this.p2 = {x: this.target2.x, y:this.target2.y};
-        }
-    };
 
-    class ArmSegment {
-        constructor(length) {
-            this.x = 0;
-            this.y = 0;
-            this.length = length;
-        }
-    };
 
     let armLength = 40;
     //let spider = [new Arm(200, 400) ];
@@ -142,7 +118,7 @@
                 arm.t+=0.1;
             }
 
-            let dist = Math.sqrt((arm.target.x-arms[0].x)*(arm.target.x-arms[0].x) + (arm.target.y-arms[0].y)*(arm.target.y-arms[0].y))
+            let dist = distance(arm.target, arms[0]);//Math.sqrt((arm.target.x-arms[0].x)*(arm.target.x-arms[0].x) + (arm.target.y-arms[0].y)*(arm.target.y-arms[0].y))
 
             if(dist > (arms.length)*armLength) {
                 for(let i = 0; i < arms.length - 1; i++) {
