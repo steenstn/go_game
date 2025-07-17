@@ -73,17 +73,13 @@
                 for(let i = 0; i < arms.length; i++) {
                     arms[i].x-=3;
                 }
+            }
                 if(Math.abs(arms[0].x - arm.p2.x) > 50) {
                     arm.target2.x = arms[0].x -80;
                     arm.p0 = {x: arm.target.x, y: arm.target.y};
                     arm.p1 = {x: arm.p0.x-arm.reach/2, y: arm.p0.y-arm.rise};
                     arm.p2 = {x: arm.p0.x-arm.reach, y: arm.target2.y};
                     arm.t=0;
-                }
-            }
-            if(keysDown.has("ArrowRight")) {
-                for(let i = 0; i < arms.length; i++) {
-                    arms[i].x+=3;
                 }
                 if(Math.abs(arms[0].x - arm.p2.x) > 50) {
                     arm.target2.x = arms[0].x - 80;
@@ -92,16 +88,16 @@
                     arm.p2 = {x: arm.p0.x+arm.reach, y: arm.target2.y};
                     arm.t=0;
                 }
+            if(keysDown.has("ArrowRight")) {
+                for(let i = 0; i < arms.length; i++) {
+                    arms[i].x+=3;
+                }
             }
             if(keysDown.has("ArrowUp")) {
-                for(let i = 0; i < arms.length; i++) {
-                    arms[i].y-=2;
-                }
+              moveUp(arms);
             }
             if(keysDown.has("ArrowDown")) {
-                for(let i = 0; i < arms.length; i++) {
-                    arms[i].y+=2;
-                }
+              moveDown(arms)
             }
 
             ctx.fillStyle = "#000";
@@ -109,8 +105,8 @@
 
 
             // Bezier curve
-            let bx = (1-arm.t)*((1-arm.t)*arm.p0.x + arm.t*arm.p1.x) + arm.t*((1-arm.t)*arm.p1.x + arm.t*arm.p2.x);
-            let by = (1-arm.t)*((1-arm.t)*arm.p0.y + arm.t*arm.p1.y) + arm.t*((1-arm.t)*arm.p1.y + arm.t*arm.p2.y);
+            let bx = bezier(arm.t, arm.p0.x, arm.p1.x, arm.p2.x);
+            let by = bezier(arm.t, arm.p0.y, arm.p1.y, arm.p2.y);
 
             arm.target.x = bx;
             arm.target.y = by;
@@ -118,7 +114,7 @@
                 arm.t+=0.1;
             }
 
-            let dist = distance(arm.target, arms[0]);//Math.sqrt((arm.target.x-arms[0].x)*(arm.target.x-arms[0].x) + (arm.target.y-arms[0].y)*(arm.target.y-arms[0].y))
+            let dist = distance(arm.target, arms[0]);
 
             if(dist > (arms.length)*armLength) {
                 for(let i = 0; i < arms.length - 1; i++) {
