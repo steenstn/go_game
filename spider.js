@@ -34,29 +34,25 @@ class Spider {
     
         let arm = this.arms[armIndex];
         let arms = arm.segments;
-            if(Math.abs(arms[0].x - arm.p2.x) > 50) {
-                arm.target2.x = arms[0].x -80;
-                arm.p0 = {x: arm.target.x, y: arm.target.y};
-                arm.p1 = {x: arm.p0.x-arm.reach/2, y: arm.p0.y-arm.rise};
-                arm.p2 = {x: arm.p0.x-arm.reach, y: arm.target2.y};
-                arm.t=0;
-            }
-            if(Math.abs(arms[0].x - arm.p2.x) > 50) {
-                arm.target2.x = arms[0].x - 80;
-                arm.p0 = {x: arm.target.x, y: arm.target.y};
-                arm.p1 = {x: arm.p0.x+arm.reach/2, y: arm.p0.y-arm.rise};
-                arm.p2 = {x: arm.p0.x+arm.reach, y: arm.target2.y};
-                arm.t=0;
-            }
-        if(keysDown.has("ArrowDown")) {
-        //  moveDown(arms)
+        if(Math.abs(arms[0].x - arm.p2.x) > 50) {
+            arm.target2.x = arms[0].x -80;
+            arm.p0 = {x: arm.target.x, y: arm.target.y};
+            arm.p1 = {x: arm.p0.x-arm.reach/2, y: arm.p0.y-arm.rise};
+            arm.p2 = {x: arm.p0.x-arm.reach, y: arm.target2.y};
+            arm.t=0;
+        }
+        if(Math.abs(arms[0].x - arm.p2.x) > 50) {
+            arm.target2.x = arms[0].x - 80;
+            arm.p0 = {x: arm.target.x, y: arm.target.y};
+            arm.p1 = {x: arm.p0.x+arm.reach/2, y: arm.p0.y-arm.rise};
+            arm.p2 = {x: arm.p0.x+arm.reach, y: arm.target2.y};
+            arm.t=0;
         }
 
         ctx.fillStyle = "#000";
       //  ctx.fillRect(target.x,target.y,2,2);
 
 
-        // Bezier curve
         let bx = bezier(arm.t, arm.p0.x, arm.p1.x, arm.p2.x);
         let by = bezier(arm.t, arm.p0.y, arm.p1.y, arm.p2.y);
 
@@ -171,6 +167,7 @@ class ArmSegment {
 let distance = (a, b) => {
     return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
 };
+
 /*
  Interpolate between p0, p1, p2 with with t = 0-1
  */
