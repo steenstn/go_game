@@ -19,38 +19,12 @@ class Spider {
 
   }
 
-  moveLeft() {
-    for(let i = 0; i < this.arms.length; i++) {
-        let arm = this.arms[i];
-        for(let j = 0; j < arm.segments.length; j++) {
-          arm.segments[j].x-=3;
-      }
-    }
-  }
-
-  moveRight() {
-    for(let i = 0; i < this.arms.length; i++) {
-      let arm = this.arms[i];
-        for(let j = 0; j < arm.segments.length; j++) {
-          arm.segments[j].x+=3;
-        }
-    }
-  }
-
-  moveUp() {
+  move(x, y) {
     for(let i = 0; i < this.arms.length; i++) {
       let arm = this.arms[i];
       for(let j = 0; j < arm.segments.length; j++) {
-        arm.segments[j].y-=2;
-      }
-    }
-  }
-
-  moveDown() {
-    for(let i = 0; i < this.arms.length; i++) {
-      let arm = this.arms[i];
-      for(let j = 0; j < arm.segments.length; j++) {
-        arm.segments[j].y+=2;
+        arm.segments[j].x+=x;
+        arm.segments[j].y+=y;
       }
     }
   }

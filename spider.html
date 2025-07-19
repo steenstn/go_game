@@ -43,17 +43,19 @@
 
     let gameLoop = () => {
       if(keysDown.has("ArrowLeft")) {
-        daSpider.moveLeft();
+        daSpider.move(-3, 0);
       }
       if(keysDown.has("ArrowRight")) {
-        daSpider.moveRight();
+        daSpider.move(3, 0);
       }
       if(keysDown.has("ArrowUp")) {
-        daSpider.moveUp();
+        daSpider.move(0, -2);
       }
       if(keysDown.has("ArrowDown")){
-        daSpider.moveDown();
+        daSpider.move(0, 2);
+        //daSpider.moveDown();
       }
+
       ctx.fillStyle = "#fff";
       ctx.fillRect(0,0,c.width, c.height);
       ctx.fillStyle = "#aaa";
