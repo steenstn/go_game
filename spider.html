@@ -11,11 +11,9 @@
     let ctx = c.getContext('2d');
 
 
-    let armLength = 40;
+    let armLength = 50;
 
-    // This should be spider variable.
     let daSpider = new Spider(200, 400);
-
 
     addEventListener("mousemove", (e) => {
         //target.x = e.clientX;
@@ -53,7 +51,6 @@
       }
       if(keysDown.has("ArrowDown")){
         daSpider.move(0, 2);
-        //daSpider.moveDown();
       }
 
       ctx.fillStyle = "#fff";

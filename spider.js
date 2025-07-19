@@ -6,16 +6,14 @@ class Spider {
       new Arm(startX, startY),
       new Arm(startX+50, startY),
       new Arm(startX+100, startY),
+      new Arm(startX+150, startY),
+      new Arm(startX+200, startY)
     ]
 
-    this.arms[0].segments[0].x = 200;
-    this.arms[0].segments[0].y = 300;
-
-    this.arms[1].segments[0].x = 200;
-    this.arms[1].segments[0].y = 300;
-
-    this.arms[2].segments[0].x = 200;
-    this.arms[2].segments[0].y = 300;
+    for(let i = 0; i < this.arms.length; i++) {
+      this.arms[i].segments[0].x = 200;
+      this.arms[i].segments[0].y = 300;
+    }
 
   }
 
