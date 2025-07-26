@@ -10,14 +10,23 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
+    let lols = [
+      {x:100, y:100}, 
+      {x:120, y:120},
+      {x:150, y:120},
+      {x:200, y:200},
+      {x:220, y:240}];
+
     let timer = 1;
     let idleTimer = 0;
-
+    let target = {x: 10, y:10};
     let daSpider = new Spider(200, 400);
 
+    let dists = getDistancesBetweenPoints(lols);
     addEventListener("mousemove", (e) => {
-        //target.x = e.clientX;
-        //target.y = e.clientY;
+        target.x = e.clientX;
+        target.y = e.clientY;
+        
     })
 
 
@@ -68,10 +77,12 @@
         daSpider.move2(daSpider.x(), daSpider.y()-2);
       }
       if(keysDown.has("ArrowDown")){
+        //daSpider.move2(400,400);
         daSpider.move2(daSpider.x(), daSpider.y()+2);
       }
 
-      daSpider.move2(daSpider.x(), daSpider.y()+0.8*Math.sin(idleTimer));
+        fabrik(lols, dists, target);
+      //daSpider.move2(daSpider.x(), daSpider.y()+0.8*Math.sin(idleTimer));
 
 
 
@@ -80,8 +91,13 @@
       ctx.fillRect(0,0,c.width, c.height);
       ctx.fillStyle = "#aaa";
       ctx.fillRect(0,400,1000,50);
-      daSpider.update();
-      daSpider.render(0,0)
+      //daSpider.update();
+      //daSpider.render(ctx,0,0)
+      ctx.beginPath();
+      lols.forEach(l => {
+        ctx.lineTo(l.x,l.y);
+        ctx.fillRect(l.x,l.y,4,4)});
+      ctx.stroke();
       setTimeout(gameLoop, 20);
     }
 

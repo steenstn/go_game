@@ -179,10 +179,9 @@
 
         } else if (entities[i].type === EntityType_Spider) {
             ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
-          console.log(-viewportX+entities[i].x, entities[i].y);
             spider.move2(entities[i].x, entities[i]);
             spider.update();
-            spider.render(-viewportX, -viewportY);
+            spider.render(ctx,-viewportX, -viewportY);
         }
 
         }

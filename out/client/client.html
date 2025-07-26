@@ -198,19 +198,21 @@ class Spider {
     }
   }
 
-  render(offsetX, offsetY) {
+  render(context, offsetX, offsetY) {
+    console.log("aaaa");
+    context.fillRect(offsetX+50, offsetY+50,100,100);
     for(let armIndex = 0; armIndex < this.arms.length; armIndex++) {
         let arm = this.arms[armIndex];
         let arms = arm.segments;
         for(let i=0; i < arms.length-1; i++) {
-            ctx.fillStyle = "#a00";
-            ctx.fillRect(offsetX+arms[i].x,offsetY+arms[i].y,5,5);
-            ctx.fillStyle= "#000";
-            ctx.fillText(""+ i, offsetX+arms[i].x, offsetY+arms[i].y )
-            ctx.beginPath();
-            ctx.moveTo( offsetX+arms[i].x, offsetY+arms[i].y);
-            ctx.lineTo(offsetX+arms[i+1].x, offsetY+arms[i+1].y);
-            ctx.stroke();
+            context.fillStyle = "#a00";
+            context.fillRect(offsetX+arms[i].x,offsetY+arms[i].y,5,5);
+            context.fillStyle= "#000";
+            context.fillText(""+ i, offsetX+arms[i].x, offsetY+arms[i].y )
+            context.beginPath();
+            context.moveTo( offsetX+arms[i].x, offsetY+arms[i].y);
+            context.lineTo(offsetX+arms[i+1].x, offsetY+arms[i+1].y);
+            context.stroke();
         }
     }
   }
@@ -464,10 +466,10 @@ let setupKeyListeners = () => {
 
         } else if (entities[i].type === EntityType_Spider) {
             ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
-          console.log(-viewportX+entities[i].x, entities[i].y);
             spider.move2(entities[i].x, entities[i]);
             spider.update();
-            spider.render(-viewportX, -viewportY);
+            spider.render(ctx,-viewportX, -viewportY);
+          console.log("wee");
         }
 
         }
