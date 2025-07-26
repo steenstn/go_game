@@ -16,6 +16,7 @@
     "use strict";
     // #include "client/enums.js"
     // #include "client/queue.js"
+    // #include "client/spider.js"
 
     let input = document.getElementById("input");
     let output = document.getElementById("output");
@@ -44,6 +45,8 @@
     let animationFlag = 0;
     let direction = 0;
     let moving = 0;
+
+    let spider = new Spider(200,200);
 
     let entities = [];
 
@@ -165,17 +168,21 @@
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
-        if(entities[i].type === 0) {
+        if(entities[i].type === EntityType_Player) {
             ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
-        } else if (entities[i].type === 1) {
+        } else if (entities[i].type === EntityType_Fly) {
             ctx.fillStyle = "#000";
             ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
             ctx.fillStyle = "#ddd";
             ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
             ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
 
-        } else if (entities[i].type === 2) {
+        } else if (entities[i].type === EntityType_Spider) {
             ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+          console.log(-viewportX+entities[i].x, entities[i].y);
+            spider.move2(entities[i].x, entities[i]);
+            spider.update();
+            spider.render(-viewportX, -viewportY);
         }
 
         }

@@ -3,15 +3,15 @@
     </head>
     <body>
 <canvas id="c"></canvas>
-<script src="spider.js"></script>
+<script src="client/spider.js"></script>
 <script>
     let c = document.getElementById('c');
     c.width = window.innerWidth-50;
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
-
-    let armLength = 50;
+    let timer = 1;
+    let idleTimer = 0;
 
     let daSpider = new Spider(200, 400);
 
@@ -25,7 +25,6 @@
     let pressKey = (key) => {
         keysDown.add(key);
     }
-
     let releaseKey = (key) => {
         keysDown.delete(key);
     };
@@ -40,24 +39,49 @@
     
 
     let gameLoop = () => {
+      //timer--;
+      idleTimer+=0.1;
+      if(idleTimer>2*Math.PI) {
+        idleTimer =0;
+      }
+      if(timer === 0) {
+        if(keysDown.has("ArrowRight")) {
+          keysDown.delete("ArrowRight");
+          keysDown.add("ArrowLeft");
+        } else if (keysDown.has("ArrowLeft")){
+          keysDown.delete("ArrowLeft");
+          keysDown.add("ArrowRight");
+        } else {
+          keysDown.add("ArrowRight");
+
+        }
+        timer = 100;
+      }
+
       if(keysDown.has("ArrowLeft")) {
-        daSpider.move(-3, 0);
+        daSpider.move2(daSpider.x()-3, daSpider.y());
       }
       if(keysDown.has("ArrowRight")) {
-        daSpider.move(3, 0);
+        daSpider.move2(daSpider.x()+3, daSpider.y());
       }
       if(keysDown.has("ArrowUp")) {
-        daSpider.move(0, -2);
+        daSpider.move2(daSpider.x(), daSpider.y()-2);
       }
       if(keysDown.has("ArrowDown")){
-        daSpider.move(0, 2);
+        daSpider.move2(daSpider.x(), daSpider.y()+2);
       }
+
+      daSpider.move2(daSpider.x(), daSpider.y()+0.8*Math.sin(idleTimer));
+
+
+
 
       ctx.fillStyle = "#fff";
       ctx.fillRect(0,0,c.width, c.height);
       ctx.fillStyle = "#aaa";
       ctx.fillRect(0,400,1000,50);
       daSpider.update();
+      daSpider.render(0,0)
       setTimeout(gameLoop, 20);
     }
 

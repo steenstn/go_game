@@ -4,7 +4,7 @@ import "math/rand/v2"
 
 var NumEntities EntityId = 0
 
-const MAX_ENTITIES = 100
+const MAX_ENTITIES = 200
 const TILE_SIZE = 50
 
 var entities = make([]EntityId, MAX_ENTITIES)
@@ -65,7 +65,7 @@ func createSpider(x float64, y float64) {
 func InitGame() {
 	println("Init game")
 	for range 10 {
-		createThing(30*50, 100)
+		createThing(30*50, 300)
 	}
 
 	createSpider(35*50, 300)
