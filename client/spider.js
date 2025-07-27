@@ -2,7 +2,6 @@
 
 let armLength = 50;
 
-
 let getDistancesBetweenPoints = (points) => {
   let distances = []
   for(let i = 0; i < points.length-1; i++) {
@@ -62,8 +61,23 @@ let fabrik = (positions, distancesBetweenJoints, target) => {
 
 }
 
-
-
+class Spider2 {
+  constructor(startX, startY) {
+    this.arms = [];
+    this.distances = [];
+    let numArms = 3
+    let arm_length = 30;
+    for(let i = 0; i < numArms; i++) {
+      let arm = [];
+      for(let j =0; j<5;j++) {
+        arm.push({x:startX+40*i+j*arm_length,y:startY+j*arm_length});
+      }
+      this.arms.push(arm);
+      this.distances.push(getDistancesBetweenPoints(arm))
+    }
+    this.body = this.arms[0][0];
+  }
+}
 
 class Spider {
   constructor(startX, startY) {

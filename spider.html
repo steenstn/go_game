@@ -9,11 +9,8 @@
     c.width = window.innerWidth-50;
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
-    let lols = [];
-    let arm_length = 30;
-    for(let i =0; i<8;i++) {
-      lols.push({x:300+i*arm_length,y:300+i*arm_length});
-    }
+
+    let spider2 = new Spider2(300,300);
 
     let timer = 1;
     let idleTimer = 0;
@@ -21,11 +18,11 @@
     let currentTarget = {x:target.x, y:target.y};
     let daSpider = new Spider(200, 400);
     let progress = 0;
-    let dists = getDistancesBetweenPoints(lols);
+    //let dists = getDistancesBetweenPoints(lols);
     addEventListener("mousemove", (e) => {
         target.x = e.clientX;
         target.y = e.clientY;
-        
+
     })
 
 
@@ -88,10 +85,13 @@
         currentTarget.y = lerp(currentTarget.y, target.y, easeOutQuad(progress));
         progress = progress >= 1 ? 1 : progress+0.01;
       } else {
-        progress =0;
+        progress = 0;
       }
 
-      fabrik(lols, dists, currentTarget) 
+      for(let i = 0; i < spider2.arms.length; i++) {
+        fabrik(spider2.arms[i], spider2.distances[i], currentTarget);
+      }
+      //fabrik(lols2, dists, currentTarget) 
 
 
 
@@ -101,13 +101,27 @@
       ctx.fillStyle = "#aaa";
       ctx.fillRect(0,400,1000,50);
       ctx.fillRect(currentTarget.x, currentTarget.y, 5,5);
+      ctx.fillRect(spider2.body.x, spider2.body.y, 5,5);
+
+      spider2.arms.forEach(arm => {
+        ctx.beginPath();
+        arm.forEach(joint => {
+          ctx.lineTo(joint.x, joint.y);
+        });
+        ctx.stroke();
+      });
       //daSpider.update();
       //daSpider.render(ctx,0,0)
-      ctx.beginPath();
+      /*ctx.beginPath();
       lols.forEach(l => {
         ctx.lineTo(l.x,l.y);
         ctx.fillRect(l.x,l.y,4,4)});
       ctx.stroke();
+      ctx.beginPath();
+      lols2.forEach(l => {
+        ctx.lineTo(l.x,l.y);
+        ctx.fillRect(l.x,l.y,4,4)});
+      ctx.stroke();*/
       setTimeout(gameLoop, 20);
     }
 
