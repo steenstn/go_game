@@ -58,6 +58,114 @@ class Queue {
 // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
 
 let armLength = 50;
+
+let getDistancesBetweenPoints = (points) => {
+  let distances = []
+  for(let i = 0; i < points.length-1; i++) {
+    distances.push(distance(points[i], points[i+1]));
+  }
+  return distances;
+}
+
+let easeOutQuad = (progress) => {
+    return 1 - (1 - progress) * (1 - progress);
+}
+
+
+let lerp = (startValue, endValue, progress) => {
+    return startValue + (endValue - startValue) * progress
+}
+
+let fabrik = (positions, distancesBetweenJoints, target) => {
+  let distanceToTarget = distance(positions[0], target);
+  let jointDistanceSum = distancesBetweenJoints.reduce( (a,b) => {return a+b}, 0);
+  if (distanceToTarget > jointDistanceSum) { // Target unreachable
+    for(let i = 0; i < positions.length-1; i++) {
+      let r = distance(target, positions[i]);
+      let delta = distancesBetweenJoints[i]/r;
+      positions[i+1].x = (1-delta)*positions[i].x+delta*target.x;
+      positions[i+1].y = (1-delta)*positions[i].y+delta*target.y;
+    }
+  } else {
+    let bx = positions[0].x;
+    let by = positions[0].y;
+    let diff = distance(positions[positions.length-1], target);
+    for(let iter = 0; iter < 3; iter++) {
+      // Stage 1: Forward reaching
+      positions[positions.length-1].x = target.x;
+      positions[positions.length-1].y = target.y;
+
+      for(let i = positions.length-2; i >=0; i--) {
+        let r = distance(positions[i+1], positions[i]);
+        let delta = distancesBetweenJoints[i]/r;
+        positions[i].x = (1-delta)*positions[i+1].x+delta*positions[i].x;
+        positions[i].y = (1-delta)*positions[i+1].y+delta*positions[i].y;
+      }
+
+      // Stage 2: Backward reaching
+      positions[0].x = bx;
+      positions[0].y = by;
+    
+      for(let i = 0; i < positions.length-2; i++) {
+        let r = distance(positions[i+1], positions[i]);
+        let delta = distancesBetweenJoints[i]/r;
+        positions[i+1].x = (1-delta)*positions[i].x + delta*positions[i+1].x;
+        positions[i+1].y = (1-delta)*positions[i].y + delta*positions[i+1].y;
+      }
+      diff = distance(positions[positions.length-1], target);
+    }
+  }
+
+}
+let fabrik2 = (positions, distancesBetweenJoints, target) => {
+  let distanceToTarget = distance(positions[0], target);
+  let jointDistanceSum = distancesBetweenJoints.reduce( (a,b) => {return a+b}, 0);
+    let bx = positions[0].x;
+    let by = positions[0].y;
+    let diff = distance(positions[positions.length-1], target);
+    for(let iter = 0; iter < 3; iter++) {
+      // Stage 1: Forward reaching
+      positions[positions.length-1].x = target.x;
+      positions[positions.length-1].y = target.y;
+
+      for(let i = positions.length-2; i >=0; i--) {
+        let r = distance(positions[i+1], positions[i]);
+        let delta = distancesBetweenJoints[i]/r;
+        positions[i].x = (1-delta)*positions[i+1].x+delta*positions[i].x;
+        positions[i].y = (1-delta)*positions[i+1].y+delta*positions[i].y;
+      }
+
+      // Stage 2: Backward reaching
+    
+      for(let i = 0; i < positions.length-2; i++) {
+        let r = distance(positions[i+1], positions[i]);
+        let delta = distancesBetweenJoints[i]/r;
+        positions[i+1].x = (1-delta)*positions[i].x + delta*positions[i+1].x;
+        positions[i+1].y = (1-delta)*positions[i].y + delta*positions[i+1].y;
+      }
+      diff = distance(positions[positions.length-1], target);
+    }
+
+}
+
+class Spider2 {
+  constructor(startX, startY) {
+    this.arms = [];
+    this.distances = [];
+    let numArms = 3
+    let arm_length = 30;
+    for(let i = 0; i < numArms; i++) {
+      let arm = [];
+      for(let j =0; j<5;j++) {
+        arm.push({x:startX+40*i+j*arm_length,y:startY+j*arm_length});
+      }
+      this.arms.push(arm);
+      this.distances.push(getDistancesBetweenPoints(arm))
+    }
+    this.body = this.arms[0][0];
+  }
+}
+
 class Spider {
   constructor(startX, startY) {
     this.arms = [
@@ -110,6 +218,8 @@ class Spider {
     for(let armIndex = 0; armIndex < this.arms.length; armIndex++) {
         let arm = this.arms[armIndex];
         let arms = arm.segments;
+        arm.target2 = arms[arms.length-1];
+        arm.target = arms[arms.length-1];
         if(Math.abs(arms[0].x - arm.p2.x) > 50) {
             arm.target2.x = arms[0].x -80;
             arm.p0 = {x: arm.target.x, y: arm.target.y};
@@ -137,7 +247,6 @@ class Spider {
         }
 
         let dist = distance(arm.target, arms[0]);
-
         if(dist > (arms.length)*armLength) {
             for(let i = 0; i < arms.length - 1; i++) {
                 let r = distance(arm.target, arms[i]);
@@ -186,7 +295,7 @@ class Spider {
     */
 
 
-        if(false) {
+        if(true) {
 
             ctx.fillStyle= "#0f0";
             ctx.fillRect(arm.target.x, arm.target.y, 10,10);
@@ -198,26 +307,25 @@ class Spider {
     }
   }
 
-  render(context, offsetX, offsetY) {
-    console.log("aaaa");
-    context.fillRect(offsetX+50, offsetY+50,100,100);
+  render(ctx, offsetX, offsetY) {
     for(let armIndex = 0; armIndex < this.arms.length; armIndex++) {
         let arm = this.arms[armIndex];
         let arms = arm.segments;
         for(let i=0; i < arms.length-1; i++) {
-            context.fillStyle = "#a00";
-            context.fillRect(offsetX+arms[i].x,offsetY+arms[i].y,5,5);
-            context.fillStyle= "#000";
-            context.fillText(""+ i, offsetX+arms[i].x, offsetY+arms[i].y )
-            context.beginPath();
-            context.moveTo( offsetX+arms[i].x, offsetY+arms[i].y);
-            context.lineTo(offsetX+arms[i+1].x, offsetY+arms[i+1].y);
-            context.stroke();
+            ctx.fillStyle = "#a00";
+            ctx.fillRect(offsetX+arms[i].x,offsetY+arms[i].y,5,5);
+            ctx.fillStyle= "#000";
+            ctx.fillText(""+ i, offsetX+arms[i].x, offsetY+arms[i].y )
+            ctx.beginPath();
+            ctx.moveTo(offsetX+arms[i].x, offsetY+arms[i].y);
+            ctx.lineTo(offsetX+arms[i+1].x, offsetY+arms[i+1].y);
+            ctx.stroke();
         }
     }
   }
 
 }
+
 
 class Arm {
     constructor(startX, startY) {
@@ -282,7 +390,7 @@ let convertKeyPressesToByte = (input) => {
     return new Uint8Array([buttonsPressed]);
 }
 
-let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+let getArrayIndex2 = (levelWidth, tileWidth, x, y) => {
     let xPos = Math.floor(x / tileWidth);
     let yPos = levelWidth * Math.floor(y/tileWidth);
     let res = Math.floor(xPos + yPos);
@@ -291,6 +399,10 @@ let getArrayIndex = (levelWidth, tileWidth, x, y) => {
     }
     return 0;
 }
+
+let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+    return Math.floor(x/tileWidth)+Math.floor(y/tileWidth)*levelWidth;
+  }
 let sendKeys = () =>  {
     let input = convertKeyPressesToByte(keysDown);
     let data = {Num: requestNumber, Input: input[0]};
@@ -333,7 +445,13 @@ let setupKeyListeners = () => {
     let direction = 0;
     let moving = 0;
 
-    let spider = new Spider(200,200);
+    //let spider = new Spider(200,200);
+    let leg = [];
+    for(let i = 0; i < 10; i++) {
+      leg.push({x:100+10*i, y:100+10*i});
+    }
+    let dists = getDistancesBetweenPoints(leg);
+
 
     let entities = [];
 
@@ -360,14 +478,14 @@ let setupKeyListeners = () => {
             let json = JSON.parse(e.data);
             let type = JSON.parse(json.Type);
             let subType = JSON.parse(json.SubType);
-            console.log("subtype", subType);
+            ////console.log("subtype", subType);
             let message = JSON.parse(atob(json.Msg));
 
             switch(type) {
                 case MessageType_GameUpdateMessage:
                     // TODO Do not reallocate this every time
                     entities = [];
-            console.log(message)
+            //console.log(message)
                     for(let i = 0; i < message.Positions.length; i++) {
                         entities.push({x: message.Positions[i].X, y: message.Positions[i].Y, type: message.Types[i]});
                     }
@@ -437,12 +555,14 @@ let setupKeyListeners = () => {
 
             // TODO: Optimize to only draw around the player
             let indexStart = getArrayIndex(50, 50, playerX, playerY);
-            for(let i = indexStart; i < currentLevel.length; i++) {
+            for(let i = 0; i < currentLevel.length; i++) {
                 //ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
                 ctx.fillStyle = currentLevel[i] == 0 ? "#000" : "#fff";
                 if(currentLevel[i]=== 1) {
                     ctx.drawImage(levelTilesetImage, Math.floor(-viewportX + x), Math.floor(-viewportY + y));
                 }
+              
+                //ctx.fillText(""+currentLevel[i], Math.floor(-viewportX + x+20), Math.floor(-viewportY + y+20));
                 //ctx.fillRect(Math.floor(-viewportX + x), Math.floor(-viewportY + y), 50, 50);
                 x+=50;
                 if(x >= 100*50) {
@@ -465,11 +585,25 @@ let setupKeyListeners = () => {
             ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
 
         } else if (entities[i].type === EntityType_Spider) {
-            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
-            spider.move2(entities[i].x, entities[i]);
-            spider.update();
-            spider.render(ctx,-viewportX, -viewportY);
-          console.log("wee");
+            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+
+          fabrik2(leg,dists,entities[i]);
+          for(let legIndex = 0; legIndex < leg.length; legIndex++) {
+            let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
+            if(currentLevel[index] !== 1) {
+              leg[legIndex].y+=2;
+            }
+          }
+          ctx.beginPath();
+          leg.forEach(l => {
+            ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
+            //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
+          });
+          ctx.stroke();
+          
+            //spider.move2(entities[i].x, entities[i]);
+            //spider.update();
+            //spider.render(ctx,-viewportX, -viewportY);
         }
 
         }

@@ -46,7 +46,13 @@
     let direction = 0;
     let moving = 0;
 
-    let spider = new Spider(200,200);
+    //let spider = new Spider(200,200);
+    let leg = [];
+    for(let i = 0; i < 10; i++) {
+      leg.push({x:100+10*i, y:100+10*i});
+    }
+    let dists = getDistancesBetweenPoints(leg);
+
 
     let entities = [];
 
@@ -73,14 +79,14 @@
             let json = JSON.parse(e.data);
             let type = JSON.parse(json.Type);
             let subType = JSON.parse(json.SubType);
-            console.log("subtype", subType);
+            ////console.log("subtype", subType);
             let message = JSON.parse(atob(json.Msg));
 
             switch(type) {
                 case MessageType_GameUpdateMessage:
                     // TODO Do not reallocate this every time
                     entities = [];
-            console.log(message)
+            //console.log(message)
                     for(let i = 0; i < message.Positions.length; i++) {
                         entities.push({x: message.Positions[i].X, y: message.Positions[i].Y, type: message.Types[i]});
                     }
@@ -150,12 +156,14 @@
 
             // TODO: Optimize to only draw around the player
             let indexStart = getArrayIndex(50, 50, playerX, playerY);
-            for(let i = indexStart; i < currentLevel.length; i++) {
+            for(let i = 0; i < currentLevel.length; i++) {
                 //ctx.fillStyle = currentLevel[i] == 0 ? "#fff" : "#000";
                 ctx.fillStyle = currentLevel[i] == 0 ? "#000" : "#fff";
                 if(currentLevel[i]=== 1) {
                     ctx.drawImage(levelTilesetImage, Math.floor(-viewportX + x), Math.floor(-viewportY + y));
                 }
+              
+                //ctx.fillText(""+currentLevel[i], Math.floor(-viewportX + x+20), Math.floor(-viewportY + y+20));
                 //ctx.fillRect(Math.floor(-viewportX + x), Math.floor(-viewportY + y), 50, 50);
                 x+=50;
                 if(x >= 100*50) {
@@ -178,10 +186,25 @@
             ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
 
         } else if (entities[i].type === EntityType_Spider) {
-            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
-            spider.move2(entities[i].x, entities[i]);
-            spider.update();
-            spider.render(ctx,-viewportX, -viewportY);
+            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+
+          fabrik2(leg,dists,entities[i]);
+          for(let legIndex = 0; legIndex < leg.length; legIndex++) {
+            let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
+            if(currentLevel[index] !== 1) {
+              leg[legIndex].y+=2;
+            }
+          }
+          ctx.beginPath();
+          leg.forEach(l => {
+            ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
+            //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
+          });
+          ctx.stroke();
+          
+            //spider.move2(entities[i].x, entities[i]);
+            //spider.update();
+            //spider.render(ctx,-viewportX, -viewportY);
         }
 
         }

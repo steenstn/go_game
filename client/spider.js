@@ -61,6 +61,27 @@ let fabrik = (positions, distancesBetweenJoints, target) => {
 
 }
 
+/*
+ This method drags to the target. No fix point
+ */
+let fabrik2 = (positions, distancesBetweenJoints, target) => {
+  let distanceToTarget = distance(positions[0], target);
+  let jointDistanceSum = distancesBetweenJoints.reduce( (a,b) => {return a+b}, 0);
+  let bx = positions[0].x;
+  let by = positions[0].y;
+  let diff = distance(positions[positions.length-1], target);
+
+  positions[positions.length-1].x = target.x;
+  positions[positions.length-1].y = target.y;
+
+  for(let i = positions.length-2; i >=0; i--) {
+    let r = distance(positions[i+1], positions[i]);
+    let delta = distancesBetweenJoints[i]/r;
+    positions[i].x = (1-delta)*positions[i+1].x+delta*positions[i].x;
+    positions[i].y = (1-delta)*positions[i+1].y+delta*positions[i].y;
+  }
+}
+
 class Spider2 {
   constructor(startX, startY) {
     this.arms = [];

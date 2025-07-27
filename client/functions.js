@@ -8,11 +8,5 @@ let convertKeyPressesToByte = (input) => {
 }
 
 let getArrayIndex = (levelWidth, tileWidth, x, y) => {
-    let xPos = Math.floor(x / tileWidth);
-    let yPos = levelWidth * Math.floor(y/tileWidth);
-    let res = Math.floor(xPos + yPos);
-    if(res < 0) {
-        res = 0;
-    }
-    return 0;
-}
+    return Math.floor(x/tileWidth)+Math.floor(y/tileWidth)*levelWidth;
+  }
