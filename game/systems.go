@@ -89,7 +89,7 @@ func HandleAI(aiRegistry map[EntityId]*AIMovement, velocityRegistry map[EntityId
 				velocity.Vy = 2 * math.Sin(ai.CurrentAngle)
 
 				if ai.Timer < 0 {
-					ai.TargetAngle = rand.Float64() * 2.1 * math.Pi
+					ai.TargetAngle = rand.Float64() * 2 * math.Pi
 					ai.Timer = rand.IntN(20)
 				}
 			}

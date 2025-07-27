@@ -10,19 +10,25 @@
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
 
-    let spider2 = new Spider2(300,300);
+    let spider = new Spider(300,300);
 
     let timer = 1;
     let idleTimer = 0;
     let target = {x: 10, y:10};
     let currentTarget = {x:target.x, y:target.y};
-    let daSpider = new Spider(200, 400);
     let progress = 0;
     //let dists = getDistancesBetweenPoints(lols);
     addEventListener("mousemove", (e) => {
         target.x = e.clientX;
         target.y = e.clientY;
+      spider.targets[0].x = target.x-50;
+      spider.targets[0].y = target.y;
 
+      spider.targets[1].x = target.x;
+      spider.targets[1].y = target.y;
+
+      spider.targets[2].x = target.x+50;
+      spider.targets[2].y = target.y;
     })
 
 
@@ -64,22 +70,18 @@
       }
 
       if(keysDown.has("ArrowLeft")) {
-        daSpider.move2(daSpider.x()-3, daSpider.y());
-        lols[0].x-=2;
+        spider.moveBody(spider.body.x-2, spider.body.y);
       }
       if(keysDown.has("ArrowRight")) {
-        //daSpider.move2(daSpider.x()+3, daSpider.y());
-        lols[0].x+=2;
+        spider.moveBody(spider.body.x+2, spider.body.y);
       }
       if(keysDown.has("ArrowUp")) {
-        daSpider.move2(daSpider.x(), daSpider.y()-2);
-        lols[0].y-=2;
+        spider.moveBody(spider.body.x, spider.body.y-2);
       }
       if(keysDown.has("ArrowDown")){
-        //daSpider.move2(400,400);
-        daSpider.move2(daSpider.x(), daSpider.y()+2);
-        lols[0].y+=2;
+        spider.moveBody(spider.body.x, spider.body.y+2);
       }
+
       if(distance(currentTarget, target) > 4) {
         currentTarget.x = lerp(currentTarget.x, target.x, easeOutQuad(progress));
         currentTarget.y = lerp(currentTarget.y, target.y, easeOutQuad(progress));
@@ -88,8 +90,8 @@
         progress = 0;
       }
 
-      for(let i = 0; i < spider2.arms.length; i++) {
-        fabrik(spider2.arms[i], spider2.distances[i], currentTarget);
+      for(let i = 0; i < spider.arms.length; i++) {
+        fabrik(spider.arms[i], spider.distances[i], spider.targets[i]);
       }
       //fabrik(lols2, dists, currentTarget) 
 
@@ -101,17 +103,15 @@
       ctx.fillStyle = "#aaa";
       ctx.fillRect(0,400,1000,50);
       ctx.fillRect(currentTarget.x, currentTarget.y, 5,5);
-      ctx.fillRect(spider2.body.x, spider2.body.y, 5,5);
+      ctx.fillRect(spider.body.x, spider.body.y, 5,5);
 
-      spider2.arms.forEach(arm => {
+      spider.arms.forEach(arm => {
         ctx.beginPath();
         arm.forEach(joint => {
           ctx.lineTo(joint.x, joint.y);
         });
         ctx.stroke();
       });
-      //daSpider.update();
-      //daSpider.render(ctx,0,0)
       /*ctx.beginPath();
       lols.forEach(l => {
         ctx.lineTo(l.x,l.y);
