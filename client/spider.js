@@ -11,40 +11,15 @@ let getDistancesBetweenPoints = (points) => {
   return distances;
 }
 
-/*let fabrik = (p, distanceBetweenJoints, t) => {
-  let dist = distance(p[0],t);
-  if (dist > 5*50) {
-    for(let i = 0; i < p.length-1;i++) {
-      let r = distance(t,p[i]);
-      let delta = 50/r;
-      p[i+1].x = (1-delta)*p[i].x + delta*t.x;
-      p[i+1].y = (1-delta)*p[i].y + delta*t.y;
-    }
-  } else {
-    let b = p[0];
-    let diff = distance(p[p.length-1], t);
-    for(let s = 0; s < 3; s++) {
-      // Stage 1
-      p[p.length-1] = t;
-      for (let i = p.length-2;i >0; i--) {
-        console.log("aasdad")
-        let r = distance(p[i+1], p[i]);
-        let lambda = 50/r;
-        p[i].x = (1-lambda)*p[i+1].x + lambda*p[i].x;
-        p[i].y = (1-lambda)*p[i+1].y + lambda*p[i].y;
-      }
-      // Stage 2
-      p[0] = b;
-      for (let i = 0; i < p.length-2; i++){
-        let r = distance(p[i+1],p[i]);
-        let lambda = 50/r;
-        p[i+1].x = (1-lambda)*p[i].x + lambda*p[i+1].x;
-        p[i+1].y = (1-lambda)*p[i].y + lambda*p[i+1].y;
-      }
-      diff = distance(p[p.length-1], t);
-    }
-  }
-}*/
+let easeOutQuad = (progress) => {
+    return 1 - (1 - progress) * (1 - progress);
+}
+
+
+let lerp = (startValue, endValue, progress) => {
+    return startValue + (endValue - startValue) * progress
+}
+
 let fabrik = (positions, distancesBetweenJoints, target) => {
   let distanceToTarget = distance(positions[0], target);
   let jointDistanceSum = distancesBetweenJoints.reduce( (a,b) => {return a+b}, 0);
@@ -59,7 +34,6 @@ let fabrik = (positions, distancesBetweenJoints, target) => {
     let bx = positions[0].x;
     let by = positions[0].y;
     let diff = distance(positions[positions.length-1], target);
-    //while(diff > 2){
     for(let iter = 0; iter < 3; iter++) {
       // Stage 1: Forward reaching
       positions[positions.length-1].x = target.x;

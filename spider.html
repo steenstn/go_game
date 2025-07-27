@@ -9,19 +9,18 @@
     c.width = window.innerWidth-50;
     c.height = window.innerHeight-50;
     let ctx = c.getContext('2d');
-
-    let lols = [
-      {x:100, y:100}, 
-      {x:120, y:120},
-      {x:150, y:120},
-      {x:200, y:200},
-      {x:220, y:240}];
+    let lols = [];
+    let arm_length = 30;
+    for(let i =0; i<8;i++) {
+      lols.push({x:300+i*arm_length,y:300+i*arm_length});
+    }
 
     let timer = 1;
     let idleTimer = 0;
     let target = {x: 10, y:10};
+    let currentTarget = {x:target.x, y:target.y};
     let daSpider = new Spider(200, 400);
-
+    let progress = 0;
     let dists = getDistancesBetweenPoints(lols);
     addEventListener("mousemove", (e) => {
         target.x = e.clientX;
@@ -69,20 +68,30 @@
 
       if(keysDown.has("ArrowLeft")) {
         daSpider.move2(daSpider.x()-3, daSpider.y());
+        lols[0].x-=2;
       }
       if(keysDown.has("ArrowRight")) {
-        daSpider.move2(daSpider.x()+3, daSpider.y());
+        //daSpider.move2(daSpider.x()+3, daSpider.y());
+        lols[0].x+=2;
       }
       if(keysDown.has("ArrowUp")) {
         daSpider.move2(daSpider.x(), daSpider.y()-2);
+        lols[0].y-=2;
       }
       if(keysDown.has("ArrowDown")){
         //daSpider.move2(400,400);
         daSpider.move2(daSpider.x(), daSpider.y()+2);
+        lols[0].y+=2;
+      }
+      if(distance(currentTarget, target) > 4) {
+        currentTarget.x = lerp(currentTarget.x, target.x, easeOutQuad(progress));
+        currentTarget.y = lerp(currentTarget.y, target.y, easeOutQuad(progress));
+        progress = progress >= 1 ? 1 : progress+0.01;
+      } else {
+        progress =0;
       }
 
-        fabrik(lols, dists, target);
-      //daSpider.move2(daSpider.x(), daSpider.y()+0.8*Math.sin(idleTimer));
+      fabrik(lols, dists, currentTarget) 
 
 
 
@@ -91,6 +100,7 @@
       ctx.fillRect(0,0,c.width, c.height);
       ctx.fillStyle = "#aaa";
       ctx.fillRect(0,400,1000,50);
+      ctx.fillRect(currentTarget.x, currentTarget.y, 5,5);
       //daSpider.update();
       //daSpider.render(ctx,0,0)
       ctx.beginPath();
