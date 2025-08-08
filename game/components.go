@@ -46,6 +46,8 @@ type CircleMovement struct {
 	Direction int
 }
 
+var MAX_JUMP int = 4
 type PlayerState struct {
+	JumpCounter int
 	Jumping bool
 }

@@ -22,9 +22,13 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 			} else {
 				velocity.Vx = 0
 			}
-			if player.Up && playerStateRegistry[e].Jumping == false{
+			if player.Up  {
 				playerStateRegistry[e].Jumping = true
-				velocity.Vy = -15
+				if playerStateRegistry[e].JumpCounter < MAX_JUMP {
+					velocity.Vy -= 6- float64(playerStateRegistry[e].JumpCounter)
+					playerStateRegistry[e].JumpCounter++
+				}
+
 			}
 		}
 	}
@@ -146,8 +150,8 @@ func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Posit
 					collided = true
 					playerState, psOk := playerStateRegistry[e]
 					if(psOk) {
-						println("reset jump")
 						playerState.Jumping = false
+						playerState.JumpCounter = 0
 					}
 					for range 100 {
 						position.Y--
@@ -170,8 +174,8 @@ func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Posit
 					collided = true
 					playerState, psOk := playerStateRegistry[e]
 					if(psOk) {
-						println("reset jump")
 						playerState.Jumping = false
+						playerState.JumpCounter = 0
 					}
 
 					for range 100 {

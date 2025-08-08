@@ -9,7 +9,7 @@ const TILE_SIZE = 50
 
 var entities = make([]EntityId, MAX_ENTITIES)
 
-var playerSpeed float64 = 7.0
+var playerSpeed float64 = 8.0
 
 type Level struct {
 	Width  int
