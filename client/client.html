@@ -178,7 +178,6 @@
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
           if(entities[i].type === EntityType_Player) {
-              //ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
               renderPlayer(viewportX, viewportY, entities[i].x, entities[i].y, direction, ctx, playerSpriteImage, animationFlag);
           } else if (entities[i].type === EntityType_Fly) {
               ctx.fillStyle = "#000";

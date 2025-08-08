@@ -9,6 +9,7 @@ var GravityRegistry = make(map[EntityId]*Force)
 var AIRegistry = make(map[EntityId]*AIMovement)
 var CircleMovementRegistry = make(map[EntityId]*CircleMovement)
 var EntityTypeRegistry = make(map[EntityId]int)
+var PlayerStateRegistry = make(map[EntityId]*PlayerState)
 
 type EntityType byte
 
@@ -43,4 +44,8 @@ type AIMovement struct {
 type CircleMovement struct {
 	Timer     int
 	Direction int
+}
+
+type PlayerState struct {
+	Jumping bool
 }

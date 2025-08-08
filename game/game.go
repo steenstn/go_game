@@ -34,6 +34,7 @@ func AddPlayer() EntityId {
 	PlayerInputRegistry[NumEntities] = &PlayerKeyPress{}
 	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
 	EntityTypeRegistry[NumEntities] = 0
+	PlayerStateRegistry[NumEntities] = &PlayerState{}
 
 	NumEntities++
 
@@ -87,10 +88,10 @@ func HandleInput(input byte, entityId EntityId) {
 
 func Tick() {
 
-	HandleDaInput(PlayerInputRegistry, VelocityRegistry)
+	HandleDaInput(PlayerInputRegistry, VelocityRegistry, PlayerStateRegistry)
 	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
 	HandleCircleMovement(CircleMovementRegistry, VelocityRegistry)
 	HandleForce(GravityRegistry, VelocityRegistry)
-	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry)
+	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry, PlayerStateRegistry)
 
 }

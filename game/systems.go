@@ -7,7 +7,7 @@ import (
 
 const TileWidth = 50
 
-func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityRegistry map[EntityId]*Velocity) {
+func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityRegistry map[EntityId]*Velocity, playerStateRegistry map[EntityId]*PlayerState) {
 
 	for e := EntityId(0); e < NumEntities; e++ {
 
@@ -22,8 +22,9 @@ func HandleDaInput(playerinputRegistry map[EntityId]*PlayerKeyPress, velocityReg
 			} else {
 				velocity.Vx = 0
 			}
-			if player.Up {
-				velocity.Vy -= 2
+			if player.Up && playerStateRegistry[e].Jumping == false{
+				playerStateRegistry[e].Jumping = true
+				velocity.Vy = -15
 			}
 		}
 	}
@@ -109,12 +110,13 @@ func HandleForce(gravityRegistry map[EntityId]*Force, velocityRegistry map[Entit
 			force, fOk := gravityRegistry[e]
 			velocity, vOk := velocityRegistry[e]
 			if vOk && fOk {
+				velocity.Vx += force.X
 				velocity.Vy += force.Y
 		}
 	}
 }
 
-func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force) {
+func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force, playerStateRegistry map[EntityId]*PlayerState) {
 
 	for e := EntityId(0); e < NumEntities; e++ {
 		position, pOk := positionRegistry[e]
@@ -135,12 +137,18 @@ func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Posit
 				position.X = oldX
 				velocity.Vx = 0
 			}
+			collided := false
 			// Check collision down
 			if velocity.Vy > 0 {
 
 				if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 1 {
 					velocity.Vy = 0
-					collided := true
+					collided = true
+					playerState, psOk := playerStateRegistry[e]
+					if(psOk) {
+						println("reset jump")
+						playerState.Jumping = false
+					}
 					for range 100 {
 						position.Y--
 						if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y+5)] == 0 {
@@ -159,7 +167,13 @@ func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Posit
 				// Check collision up
 				if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y-2)] == 1 {
 					velocity.Vy = 0
-					collided := true
+					collided = true
+					playerState, psOk := playerStateRegistry[e]
+					if(psOk) {
+						println("reset jump")
+						playerState.Jumping = false
+					}
+
 					for range 100 {
 						position.Y++
 						if level.Data[getArrayIndex(level.Width, tileWidth, position.X, position.Y-2)] == 0 {
