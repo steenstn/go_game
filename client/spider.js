@@ -2,6 +2,10 @@
 
 let armLength = 50;
 
+let distance = (a, b) => {
+    return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
+};
+
 let getDistancesBetweenPoints = (points) => {
   let distances = []
   for(let i = 0; i < points.length-1; i++) {
@@ -87,7 +91,6 @@ class Spider {
     this.arms = [];
     this.distances = [];
     this.targets = [];
-    this.currentTargetsPositions = [];
     let numArms = 3;
     let arm_length = 30;
     for(let i = 0; i < numArms; i++) {
@@ -122,9 +125,27 @@ let updateTargets = (targets, origin) => {
   });
 }
 
-let distance = (a, b) => {
-    return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
-};
+/*
+ 
+0 1 2 3 4
+
+
+-1 -0.5 0 0.5 1
+
+
+ */
+let getNewTargets = (targets, origin) => {
+  // TODO allocate right away
+  let newTargets = [];
+
+  targets.forEach((t, i) => {
+      let normalizedI = i/(targets.length);
+      let optimalDiff = origin.x-40+normalizedI*150;
+      let diff = origin.x-t.x;
+        newTargets.push({x:optimalDiff, y:400});
+  });
+  return newTargets;
+}
 
 /*
  Interpolate between p0, p1, p2 with with t = 0-1
