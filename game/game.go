@@ -56,6 +56,7 @@ func createFly(x float64, y float64) {
 func createSpider(x float64, y float64) {
 	PositionRegistry[NumEntities] = &Position{X: x, Y: y}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 3, Vy: 0}
+	RepeatingTimerRegistry[NumEntities] = &RepeatingTimer{GenerateStartValue: func() int { return rand.IntN(100)}} 
 	CircleMovementRegistry[NumEntities] = &CircleMovement{Timer: 20, Direction: 1}
 	EntityTypeRegistry[NumEntities] = 2
 
@@ -89,8 +90,9 @@ func HandleInput(input byte, entityId EntityId) {
 func Tick() {
 
 	HandleDaInput(PlayerInputRegistry, VelocityRegistry, PlayerStateRegistry)
+	HandleTimers(RepeatingTimerRegistry)
 	HandleAI(AIRegistry, VelocityRegistry, PlayerEntities, PositionRegistry)
-	HandleCircleMovement(CircleMovementRegistry, VelocityRegistry)
+	HandleCircleMovement(CircleMovementRegistry, VelocityRegistry, RepeatingTimerRegistry)
 	HandleForce(GravityRegistry, VelocityRegistry)
 	MoveStuff(&CurrentLevel, TILE_SIZE, PositionRegistry, VelocityRegistry, GravityRegistry, PlayerStateRegistry)
 
