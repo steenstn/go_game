@@ -104,16 +104,23 @@ func getArrayIndex(levelWidth int, tileWidth int, x float64, y float64) int {
 	return int(xPosition + yPosition)
 }
 
+func HandleForce(gravityRegistry map[EntityId]*Force, velocityRegistry map[EntityId]*Velocity) {
+	for e := EntityId(0); e < NumEntities; e++ {
+			force, fOk := gravityRegistry[e]
+			velocity, vOk := velocityRegistry[e]
+			if vOk && fOk {
+				velocity.Vy += force.Y
+		}
+	}
+}
+
 func MoveStuff(level *Level, tileWidth int, positionRegistry map[EntityId]*Position, velocityRegistry map[EntityId]*Velocity, gravityRegistry map[EntityId]*Force) {
 
 	for e := EntityId(0); e < NumEntities; e++ {
 		position, pOk := positionRegistry[e]
 		velocity, vOk := velocityRegistry[e]
-		force, fOk := gravityRegistry[e]
 
-		if pOk && vOk && fOk {
-
-			velocity.Vy += force.Y
+		if pOk && vOk {
 
 			oldX := position.X
 			oldY := position.Y

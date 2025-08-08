@@ -18,7 +18,6 @@ let easeOutQuad = (progress) => {
     return 1 - (1 - progress) * (1 - progress);
 }
 
-
 let lerp = (startValue, endValue, progress) => {
     return startValue + (endValue - startValue) * progress
 }

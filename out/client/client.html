@@ -62,6 +62,10 @@ class Queue {
 
 let armLength = 50;
 
+let distance = (a, b) => {
+    return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
+};
+
 let getDistancesBetweenPoints = (points) => {
   let distances = []
   for(let i = 0; i < points.length-1; i++) {
@@ -73,7 +77,6 @@ let getDistancesBetweenPoints = (points) => {
 let easeOutQuad = (progress) => {
     return 1 - (1 - progress) * (1 - progress);
 }
-
 
 let lerp = (startValue, endValue, progress) => {
     return startValue + (endValue - startValue) * progress
@@ -147,16 +150,16 @@ class Spider {
     this.arms = [];
     this.distances = [];
     this.targets = [];
-    let numArms = 1;
+    let numArms = 3;
     let arm_length = 30;
     for(let i = 0; i < numArms; i++) {
       let arm = [{x: startX, y:startY}];
-      for(let j =1; j<=5;j++) {
-        arm.push({x:startX+40*i+j*arm_length,y:startY+j*arm_length});
+      for(let j =1; j<=3;j++) {
+        arm.push({x:startX+40+j*arm_length,y:startY+j*arm_length});
       }
       this.arms.push(arm);
       this.distances.push(getDistancesBetweenPoints(arm))
-      this.targets.push({x:this.arms[i][numArms-1].x, y:this.arms[i][numArms-1].y+40});
+      this.targets.push({x:this.arms[i][numArms-1].x+i*40, y:this.arms[i][numArms-1].y+40});
     }
     this.body = this.arms[0][0];
   }
@@ -172,22 +175,36 @@ class Spider {
 let updateTargets = (targets, origin) => {
   targets.forEach((t, i) => {
     let normalizedI = i-(targets.length/2)+0.5;
-/*
- 0 1 2 3
-
- -1, 1
- */
+    //
     //console.log(i, normalizedI)
-    if(Math.abs(t.x+20*normalizedI -origin.x) > 100) {
+    if(Math.abs(t.x+20*normalizedI -origin.x) > 90) {
       let diff = t.x - origin.x;
       t.x-=diff*1.5;
     }
   });
 }
 
-let distance = (a, b) => {
-    return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
-};
+/*
+ 
+0 1 2 3 4
+
+
+-1 -0.5 0 0.5 1
+
+
+ */
+let getNewTargets = (targets, origin) => {
+  // TODO allocate right away
+  let newTargets = [];
+
+  targets.forEach((t, i) => {
+      let normalizedI = i/(targets.length);
+      let optimalDiff = origin.x-40+normalizedI*150;
+      let diff = origin.x-t.x;
+        newTargets.push({x:optimalDiff, y:400});
+  });
+  return newTargets;
+}
 
 /*
  Interpolate between p0, p1, p2 with with t = 0-1
