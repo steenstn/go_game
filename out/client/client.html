@@ -14,6 +14,7 @@
 <pre id="output"></pre>
 <script>
     "use strict";
+// client/enums.js
 const EntityType_Player = 0;
 const EntityType_Fly = 1;
 const EntityType_Spider = 2;
@@ -23,6 +24,7 @@ const MessageType_PlayerPositionMessage = 2;
 const SetupMessageSubType_Level = 0;
 const SetupMessageSubType_PlayerSprite = 1;
 const SetupMessageSubType_LevelTileset = 2;
+// client/queue.js
 // Circular array queue
 class Queue {
     
@@ -55,6 +57,7 @@ class Queue {
         return value;
     }
 }
+// client/spider.js
 // https://www.researchgate.net/publication/220632147_FABRIK_A_fast_iterative_solver_for_the_Inverse_Kinematics_problem
 
 let armLength = 50;
@@ -139,212 +142,48 @@ let fabrik2 = (positions, distancesBetweenJoints, target) => {
   }
 }
 
-class Spider2 {
+class Spider {
   constructor(startX, startY) {
     this.arms = [];
     this.distances = [];
-    let numArms = 3
+    this.targets = [];
+    let numArms = 1;
     let arm_length = 30;
     for(let i = 0; i < numArms; i++) {
-      let arm = [];
-      for(let j =0; j<5;j++) {
+      let arm = [{x: startX, y:startY}];
+      for(let j =1; j<=5;j++) {
         arm.push({x:startX+40*i+j*arm_length,y:startY+j*arm_length});
       }
       this.arms.push(arm);
       this.distances.push(getDistancesBetweenPoints(arm))
+      this.targets.push({x:this.arms[i][numArms-1].x, y:this.arms[i][numArms-1].y+40});
     }
     this.body = this.arms[0][0];
   }
+
+  moveBody(x, y) {
+    this.arms.forEach(arm => {
+      arm[0].x = x;
+      arm[0].y = y;
+    })
+  }
 }
 
-class Spider {
-  constructor(startX, startY) {
-    this.arms = [
-      new Arm(startX, startY),
-      new Arm(startX+50, startY),
-      new Arm(startX+100, startY),
-      new Arm(startX+150, startY),
-    ]
-
-    for(let i = 0; i < this.arms.length; i++) {
-      this.arms[i].segments[0].x = 200;
-      this.arms[i].segments[0].y = 300;
-    }
-
-  }
-
-  x() {
-    return this.arms[0].segments[0].x;
-  }
-
-  y() {
-    return this.arms[0].segments[0].y;
-  }
-
-  move(x, y) {
-    for(let i = 0; i < this.arms.length; i++) {
-      let arm = this.arms[i];
-      for(let j = 0; j < arm.segments.length; j++) {
-        arm.segments[j].x+=x;
-        arm.segments[j].y+=y;
-      }
-    }
-  }
-
-  move2(x, y) {
-    for(let i = 0; i < this.arms.length; i++) {
-      let arm = this.arms[i];
-        let oldX = arm.segments[0].x;
-        let oldY = arm.segments[0].y;
-        arm.segments[0].x=x;
-        arm.segments[0].y=y;
-      for(let j = 1; j < arm.segments.length; j++) {
-        arm.segments[j].x+=arm.segments[0].x-oldX;
-        arm.segments[j].y+=arm.segments[0].y-oldY;
-      }
-      }
-  }
-
-  update() {
-    for(let armIndex = 0; armIndex < this.arms.length; armIndex++) {
-        let arm = this.arms[armIndex];
-        let arms = arm.segments;
-        arm.target2 = arms[arms.length-1];
-        arm.target = arms[arms.length-1];
-        if(Math.abs(arms[0].x - arm.p2.x) > 50) {
-            arm.target2.x = arms[0].x -80;
-            arm.p0 = {x: arm.target.x, y: arm.target.y};
-            arm.p1 = {x: arm.p0.x-arm.reach/2, y: arm.p0.y-arm.rise};
-            arm.p2 = {x: arm.p0.x-arm.reach, y: arm.target2.y};
-            arm.t=0;
-        }
-        if(Math.abs(arms[0].x - arm.p2.x) > 50) {
-            arm.target2.x = arms[0].x - 80;
-            arm.p0 = {x: arm.target.x, y: arm.target.y};
-            arm.p1 = {x: arm.p0.x+arm.reach/2, y: arm.p0.y-arm.rise};
-            arm.p2 = {x: arm.p0.x+arm.reach, y: arm.target2.y};
-            arm.t=0;
-        }
-
-        ctx.fillStyle = "#000";
-
-        let bx = bezier(arm.t, arm.p0.x, arm.p1.x, arm.p2.x);
-        let by = bezier(arm.t, arm.p0.y, arm.p1.y, arm.p2.y);
-
-        arm.target.x = bx;
-        arm.target.y = by;
-        if(arm.t <1) {
-            arm.t+=0.1;
-        }
-
-        let dist = distance(arm.target, arms[0]);
-        if(dist > (arms.length)*armLength) {
-            for(let i = 0; i < arms.length - 1; i++) {
-                let r = distance(arm.target, arms[i]);
-                let delta = armLength/r;
-                arms[i+1].x = (1-delta) * arms[i].x + delta*arm.target.x;
-                arms[i+1].y = (1-delta) * arms[i].y + delta*arm.target.y;
-            }
-        } else {
-            let bx = arms[0].x;
-            let by = arms[0].y;
-            let max = 500;
-            let iterations = 0;
-            let diff = distance(arms[arms.length-1], arm.target);
-            while (diff > 2 && iterations < max) {
-                iterations++;
-                arms[arms.length-1].x = arm.target.x;
-                arms[arms.length-1].y = arm.target.y;
-                for(let i = arms.length-2; i >=0; i--) {
-                    let r = distance(arms[i+1], arms[i]);
-                    let delta = armLength/r;
-                    arms[i].x = (1-delta)*arms[i+1].x + delta*arms[i].x;
-                    arms[i].y = (1-delta)*arms[i+1].y + delta*arms[i].y;
-                }
-
-                arms[0].x = bx;
-                arms[0].y = by;
-                for(let i = 0; i < arms.length-1; i++) {
-                    let r = distance(arms[i+1], arms[i]);
-                    let delta = armLength/r;
-                    arms[i+1].x = (1-delta)*arms[i].x + delta*arms[i+1].x;
-                    arms[i+1].y = (1-delta)*arms[i].y + delta*arms[i+1].y;
-                }
-                diff = distance(arms[arms.length-1], arm.target);
-            }
-
-        }
-
-        // Rotation check
+let updateTargets = (targets, origin) => {
+  targets.forEach((t, i) => {
+    let normalizedI = i-(targets.length/2)+0.5;
 /*
-        for(let i=0; i < arms.length-2; i++) {
-            let angle = Math.atan2(arms[i+1].y-arms[i].y, arms[i+1].x-arms[i].x);
-            let angle2 = Math.atan2(arms[i+2].y-arms[i].y, arms[i+2].x-arms[i].x);
-            ctx.fillText(""+ (angle*(180/Math.PI)), arms[i].x+20, arms[i].y )
-            ctx.fillText(""+ (angle2*(180/Math.PI)), arms[i].x+20, arms[i].y+20 )
-        }
-    */
+ 0 1 2 3
 
-
-        if(true) {
-
-            ctx.fillStyle= "#0f0";
-            ctx.fillRect(arm.target.x, arm.target.y, 10,10);
-            ctx.fillStyle= "#060";
-            ctx.fillRect(arm.target2.x, arm.target2.y, 10,10);
-            ctx.fillStyle= "#06f";
-            ctx.fillText("arm.target2", arm.target2.x, arm.target2.y);
-        }
+ -1, 1
+ */
+    //console.log(i, normalizedI)
+    if(Math.abs(t.x+20*normalizedI -origin.x) > 100) {
+      let diff = t.x - origin.x;
+      t.x-=diff*1.5;
     }
-  }
-
-  render(ctx, offsetX, offsetY) {
-    for(let armIndex = 0; armIndex < this.arms.length; armIndex++) {
-        let arm = this.arms[armIndex];
-        let arms = arm.segments;
-        for(let i=0; i < arms.length-1; i++) {
-            ctx.fillStyle = "#a00";
-            ctx.fillRect(offsetX+arms[i].x,offsetY+arms[i].y,5,5);
-            ctx.fillStyle= "#000";
-            ctx.fillText(""+ i, offsetX+arms[i].x, offsetY+arms[i].y )
-            ctx.beginPath();
-            ctx.moveTo(offsetX+arms[i].x, offsetY+arms[i].y);
-            ctx.lineTo(offsetX+arms[i+1].x, offsetY+arms[i+1].y);
-            ctx.stroke();
-        }
-    }
-  }
-
+  });
 }
-
-
-class Arm {
-    constructor(startX, startY) {
-        this.segments = [
-            new ArmSegment(50),
-            new ArmSegment(50),
-            new ArmSegment(50),
-            new ArmSegment(50)
-        ]
-        this.t=0;
-        this.target = {x: startX, y: startY};
-        this.target2 = {x: this.target.x, y: this.target.y};
-        this.rise = 60;
-        this.reach = 120;
-        this.p0 = {x: this.target2.x, y:this.target2.y};
-        this.p1 = {x: this.target2.x, y:this.target2.y};
-        this.p2 = {x: this.target2.x, y:this.target2.y};
-    }
-};
-
-class ArmSegment {
-    constructor(length) {
-        this.x = 0;
-        this.y = 0;
-        this.length = length;
-    }
-};
-
 
 let distance = (a, b) => {
     return Math.sqrt((a.x - b.x)*(a.x-b.x) + (a.y - b.y)*(a.y-b.y));
@@ -358,6 +197,11 @@ let bezier = (t, p0, p1, p2) => {
 }
 
 
+// client/render.js
+
+let renderPlayer = (viewportX, viewportY, x, y, direction, context, image, animationFlag) => {
+  context.drawImage(image, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+x-5, -viewportY+y-20,30,30);
+}
 
     let input = document.getElementById("input");
     let output = document.getElementById("output");
@@ -372,6 +216,12 @@ let bezier = (t, p0, p1, p2) => {
 
     let inputHistory = [];
     let requestNumber = 0;
+// client/functions.js
+
+let getArrayIndex = (levelWidth, tileWidth, x, y) => {
+    return Math.floor(x/tileWidth)+Math.floor(y/tileWidth)*levelWidth;
+  }
+// client/input.js
 let convertKeyPressesToByte = (input) => {
    let buttonsPressed =
         (1 & (input.has("ArrowUp")? 1 : 0) ) |
@@ -381,9 +231,6 @@ let convertKeyPressesToByte = (input) => {
     return new Uint8Array([buttonsPressed]);
 }
 
-let getArrayIndex = (levelWidth, tileWidth, x, y) => {
-    return Math.floor(x/tileWidth)+Math.floor(y/tileWidth)*levelWidth;
-  }
 let sendKeys = () =>  {
     let input = convertKeyPressesToByte(keysDown);
     let data = {Num: requestNumber, Input: input[0]};
@@ -556,43 +403,44 @@ let setupKeyListeners = () => {
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
-        if(entities[i].type === EntityType_Player) {
-            ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
-        } else if (entities[i].type === EntityType_Fly) {
-            ctx.fillStyle = "#000";
-            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
-            ctx.fillStyle = "#ddd";
-            ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
-            ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+          if(entities[i].type === EntityType_Player) {
+              //ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
+              renderPlayer(viewportX, viewportY, entities[i].x, entities[i].y, direction, ctx, playerSpriteImage, animationFlag);
+          } else if (entities[i].type === EntityType_Fly) {
+              ctx.fillStyle = "#000";
+              ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
+              ctx.fillStyle = "#ddd";
+              ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+              ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
 
-        } else if (entities[i].type === EntityType_Spider) {
-            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+          } else if (entities[i].type === EntityType_Spider) {
+              //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
 
-          fabrik2(leg,dists,entities[i]);
-          for(let legIndex = 0; legIndex < leg.length; legIndex++) {
-            let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
-            if(currentLevel[index] !== 1) {
-              leg[legIndex].y+=2;
+            fabrik2(leg,dists,entities[i]);
+            for(let legIndex = 0; legIndex < leg.length; legIndex++) {
+              let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
+              if(currentLevel[index] !== 1) {
+                leg[legIndex].y+=2;
+              }
             }
+            ctx.beginPath();
+            leg.forEach(l => {
+              ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
+              //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
+            });
+            ctx.stroke();
+            
+              //spider.move2(entities[i].x, entities[i]);
+              //spider.update();
+              //spider.render(ctx,-viewportX, -viewportY);
           }
-          ctx.beginPath();
-          leg.forEach(l => {
-            ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
-            //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
-          });
-          ctx.stroke();
-          
-            //spider.move2(entities[i].x, entities[i]);
-            //spider.update();
-            //spider.render(ctx,-viewportX, -viewportY);
-        }
 
         }
-                // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
-            viewportX = Math.max(1, playerX-c.width/2);
-            viewportX = Math.min(50*100-(c.width),viewportX);
-            viewportY = Math.max(1, playerY-c.height/2);
-            viewportY = Math.min(50*20-(c.height),viewportY);
+        // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
+        viewportX = Math.max(1, playerX-c.width/2);
+        viewportX = Math.min(50*100-(c.width),viewportX);
+        viewportY = Math.max(1, playerY-c.height/2);
+        viewportY = Math.min(50*20-(c.height),viewportY);
 
         animationCounter++;
         if (animationCounter > 5) {

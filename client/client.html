@@ -17,6 +17,7 @@
     // #include "client/enums.js"
     // #include "client/queue.js"
     // #include "client/spider.js"
+    // #include "client/render.js"
 
     let input = document.getElementById("input");
     let output = document.getElementById("output");
@@ -176,43 +177,44 @@
         
         ctx.fillStyle = "#fff";
         for(let i = 0; i < entities.length; i++) {
-        if(entities[i].type === EntityType_Player) {
-            ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
-        } else if (entities[i].type === EntityType_Fly) {
-            ctx.fillStyle = "#000";
-            ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
-            ctx.fillStyle = "#ddd";
-            ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
-            ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+          if(entities[i].type === EntityType_Player) {
+              //ctx.drawImage(playerSpriteImage, 0+20*animationFlag,0+30*direction, 20,30,-viewportX+entities[i].x-5, -viewportY+entities[i].y-20,30,30);
+              renderPlayer(viewportX, viewportY, entities[i].x, entities[i].y, direction, ctx, playerSpriteImage, animationFlag);
+          } else if (entities[i].type === EntityType_Fly) {
+              ctx.fillStyle = "#000";
+              ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 3, 3);
+              ctx.fillStyle = "#ddd";
+              ctx.fillRect(-viewportX + entities[i].x+4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
+              ctx.fillRect(-viewportX + entities[i].x-4, -viewportY + entities[i].y-3*Math.random()+1*Math.random(), 4, 4);
 
-        } else if (entities[i].type === EntityType_Spider) {
-            //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
+          } else if (entities[i].type === EntityType_Spider) {
+              //ctx.fillRect(-viewportX + entities[i].x, -viewportY + entities[i].y, 40, 10);
 
-          fabrik2(leg,dists,entities[i]);
-          for(let legIndex = 0; legIndex < leg.length; legIndex++) {
-            let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
-            if(currentLevel[index] !== 1) {
-              leg[legIndex].y+=2;
+            fabrik2(leg,dists,entities[i]);
+            for(let legIndex = 0; legIndex < leg.length; legIndex++) {
+              let index = getArrayIndex(50, 50, leg[legIndex].x, leg[legIndex].y);
+              if(currentLevel[index] !== 1) {
+                leg[legIndex].y+=2;
+              }
             }
+            ctx.beginPath();
+            leg.forEach(l => {
+              ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
+              //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
+            });
+            ctx.stroke();
+            
+              //spider.move2(entities[i].x, entities[i]);
+              //spider.update();
+              //spider.render(ctx,-viewportX, -viewportY);
           }
-          ctx.beginPath();
-          leg.forEach(l => {
-            ctx.lineTo(-viewportX + l.x, -viewportY + l.y);
-            //ctx.fillRect(-viewportX + l.x,-viewportY +  l.y, 40, 10);
-          });
-          ctx.stroke();
-          
-            //spider.move2(entities[i].x, entities[i]);
-            //spider.update();
-            //spider.render(ctx,-viewportX, -viewportY);
-        }
 
         }
-                // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
-            viewportX = Math.max(1, playerX-c.width/2);
-            viewportX = Math.min(50*100-(c.width),viewportX);
-            viewportY = Math.max(1, playerY-c.height/2);
-            viewportY = Math.min(50*20-(c.height),viewportY);
+        // Stop viewport from going outside of level (50*50 and 50*20 is level dimensions)
+        viewportX = Math.max(1, playerX-c.width/2);
+        viewportX = Math.min(50*100-(c.width),viewportX);
+        viewportY = Math.max(1, playerY-c.height/2);
+        viewportY = Math.min(50*20-(c.height),viewportY);
 
         animationCounter++;
         if (animationCounter > 5) {

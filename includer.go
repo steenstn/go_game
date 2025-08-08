@@ -42,6 +42,7 @@ func javascriptParseInclude(filename string) {
 				log.Fatal(includeErr)
 				panic("Could not open " + filePath)
 			}
+			outputFile.WriteString("// " + filePath + "\n")
 			includeScanner := bufio.NewScanner(includeFile)
 			for includeScanner.Scan() {
 				outputFile.WriteString(includeScanner.Text() + "\n")

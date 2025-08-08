@@ -87,16 +87,17 @@ class Spider {
     this.arms = [];
     this.distances = [];
     this.targets = [];
-    let numArms = 3
+    this.currentTargetsPositions = [];
+    let numArms = 3;
     let arm_length = 30;
     for(let i = 0; i < numArms; i++) {
       let arm = [{x: startX, y:startY}];
-      for(let j =1; j<=5;j++) {
-        arm.push({x:startX+40*i+j*arm_length,y:startY+j*arm_length});
+      for(let j =1; j<=3;j++) {
+        arm.push({x:startX+40+j*arm_length,y:startY+j*arm_length});
       }
       this.arms.push(arm);
       this.distances.push(getDistancesBetweenPoints(arm))
-      this.targets.push({x:this.arms[i][numArms-1].x, y:this.arms[i][numArms-1].y+40});
+      this.targets.push({x:this.arms[i][numArms-1].x+i*40, y:this.arms[i][numArms-1].y+40});
     }
     this.body = this.arms[0][0];
   }
@@ -107,6 +108,18 @@ class Spider {
       arm[0].y = y;
     })
   }
+}
+
+let updateTargets = (targets, origin) => {
+  targets.forEach((t, i) => {
+    let normalizedI = i-(targets.length/2)+0.5;
+    //
+    //console.log(i, normalizedI)
+    if(Math.abs(t.x+20*normalizedI -origin.x) > 90) {
+      let diff = t.x - origin.x;
+      t.x-=diff*1.5;
+    }
+  });
 }
 
 let distance = (a, b) => {

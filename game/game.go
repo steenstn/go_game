@@ -42,7 +42,7 @@ func AddPlayer() EntityId {
 	return NumEntities - 1
 }
 
-func createThing(x float64, y float64) {
+func createFly(x float64, y float64) {
 	PositionRegistry[NumEntities] = &Position{X: x, Y: y}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 0, Vy: 0}
 	AIRegistry[NumEntities] = &AIMovement{Timer: rand.IntN(100)}
@@ -55,7 +55,7 @@ func createThing(x float64, y float64) {
 func createSpider(x float64, y float64) {
 	PositionRegistry[NumEntities] = &Position{X: x, Y: y}
 	VelocityRegistry[NumEntities] = &Velocity{Vx: 3, Vy: 0}
-	GravityRegistry[NumEntities] = &Force{X: 0, Y: 1}
+	GravityRegistry[NumEntities] = &Force{X: 0, Y: 0}
 	CircleMovementRegistry[NumEntities] = &CircleMovement{Timer: 20, Direction: 1}
 	EntityTypeRegistry[NumEntities] = 2
 
@@ -65,7 +65,7 @@ func createSpider(x float64, y float64) {
 func InitGame() {
 	println("Init game")
 	for range 10 {
-		createThing(30*50, 300)
+		createFly(30*50, 300)
 	}
 
 	createSpider(35*50, 300)

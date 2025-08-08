@@ -18,9 +18,9 @@
     let currentTarget = {x:target.x, y:target.y};
     let progress = 0;
     //let dists = getDistancesBetweenPoints(lols);
-    addEventListener("mousemove", (e) => {
+/*    addEventListener("mousemove", (e) => {
         target.x = e.clientX;
-        target.y = e.clientY;
+        target.y = 400;//e.clientY;
       spider.targets[0].x = target.x-50;
       spider.targets[0].y = target.y;
 
@@ -30,6 +30,7 @@
       spider.targets[2].x = target.x+50;
       spider.targets[2].y = target.y;
     })
+    */
 
 
     let keysDown = new Set();
@@ -93,6 +94,7 @@
       for(let i = 0; i < spider.arms.length; i++) {
         fabrik(spider.arms[i], spider.distances[i], spider.targets[i]);
       }
+      updateTargets(spider.targets, spider.body);
       //fabrik(lols2, dists, currentTarget) 
 
 
