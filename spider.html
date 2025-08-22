@@ -80,10 +80,10 @@
       }
 
       if(keysDown.has("ArrowLeft")) {
-        spider.moveBody(spider.body.x-2, spider.body.y);
+        spider.moveBody(spider.body.x-3, spider.body.y);
       }
       if(keysDown.has("ArrowRight")) {
-        spider.moveBody(spider.body.x+2, spider.body.y);
+        spider.moveBody(spider.body.x+3, spider.body.y);
       }
       if(keysDown.has("ArrowUp")) {
         spider.moveBody(spider.body.x, spider.body.y-2);
@@ -119,7 +119,7 @@
           spider.targets[i].x = bezier(progress[i], oldTargets[i].x,newTargets[i].x, newTargets[i].x);
           spider.targets[i].y = bezier(progress[i], oldTargets[i].y,newTargets[i].y-60, newTargets[i].y);
 
-          progress[i] = progress[i] >= 1 ? 1 : progress[i]+0.04;
+          progress[i] = progress[i] >= 1 ? 1 : progress[i]+0.08;
 
           if(distance(spider.targets[i], newTargets[i]) < 2) {
             oldTargets[i] = {x:spider.targets[i].x, y:spider.targets[i].y};

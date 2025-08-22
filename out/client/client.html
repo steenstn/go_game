@@ -234,10 +234,10 @@ let renderPlayer = (viewportX, viewportY, x, y, direction, context, image, anima
     let inputHistory = [];
     let requestNumber = 0;
 // client/functions.js
-
-let getArrayIndex = (levelWidth, tileWidth, x, y) => {
-    return Math.floor(x/tileWidth)+Math.floor(y/tileWidth)*levelWidth;
-  }
+"use strict";
+function getArrayIndex(levelWidth, tileWidth, x, y) {
+    return Math.floor(x / tileWidth) + Math.floor(y / tileWidth) * levelWidth;
+}
 // client/input.js
 let convertKeyPressesToByte = (input) => {
    let buttonsPressed =
