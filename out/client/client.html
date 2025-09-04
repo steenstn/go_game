@@ -10,6 +10,9 @@
         </style>
     </head>
  <body>
+    <input id="input" type="text" value="http://localhost:8080" />
+    <button id="connectButton" onclick="joinGame()">Connect</button><br /><br />
+
 <canvas id="c"></canvas>
 <pre id="output"></pre>
 <script>
@@ -228,7 +231,7 @@ let renderPlayer = (viewportX, viewportY, x, y, direction, context, image, anima
 
     let c = document.getElementById('c');
     c.width = window.innerWidth-50;
-    c.height = window.innerHeight-50;
+    c.height = window.innerHeight-150;
     let ctx = c.getContext('2d');
 
     let inputHistory = [];
@@ -312,7 +315,17 @@ let setupKeyListeners = () => {
     }
 
     let joinGame = () => {
-        socket = new WebSocket("ws://localhost:8080/join");
+        //socket = new WebSocket("ws://localhost:8080/join");
+        let search = window.location.search;
+        console.log(search);
+        if (search.includes("serveo")) {
+            let serveoUrl = search.split("=")[1];
+            console.log(serveoUrl);
+            socket = new WebSocket("ws://" + serveoUrl +".serveo.net/join");
+        } else {
+            socket = new WebSocket("ws://localhost:8080/join");
+        }
+
         socket.onopen = function () {
             output.innerText += "Status: Connected\n";
         };
@@ -469,9 +482,7 @@ let setupKeyListeners = () => {
         //requestAnimationFrame(gameLoop);
     }
 
-
     joinGame();
-
 </script>
     </body>
 </html>

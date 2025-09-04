@@ -217,6 +217,7 @@ func inputLoop(client *Client, entityId game.EntityId) {
 
 func join(responseWriter http.ResponseWriter, request *http.Request) {
 	fmt.Printf("%s connected\n", request.Host)
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, upgradeError := upgrader.Upgrade(responseWriter, request, nil)
 
 	if upgradeError != nil {
