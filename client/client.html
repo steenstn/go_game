@@ -81,6 +81,7 @@
             socket = new WebSocket("wss://" + serveoUrl +".serveo.net/join");
         } else {
             socket = new WebSocket("wss://localhost:8080/join");
+            socket = new WebSocket("wss://e0c8dad58aac.ngrok-free.app/join");
         }
 
         socket.onopen = function () {
