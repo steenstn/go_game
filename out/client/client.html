@@ -321,9 +321,9 @@ let setupKeyListeners = () => {
         if (search.includes("serveo")) {
             let serveoUrl = search.split("=")[1];
             console.log(serveoUrl);
-            socket = new WebSocket("ws://" + serveoUrl +".serveo.net/join");
+            socket = new WebSocket("wss://" + serveoUrl +".serveo.net/join");
         } else {
-            socket = new WebSocket("ws://localhost:8080/join");
+            socket = new WebSocket("wss://localhost:8080/join");
         }
 
         socket.onopen = function () {

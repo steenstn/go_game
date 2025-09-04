@@ -127,7 +127,8 @@ func main() {
 	})
 
 	println("Listening")
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServeTLS(":8080", "server.crt", "server.key", nil)
+	//err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		println(err.Error())
 	}
